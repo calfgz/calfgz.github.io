@@ -1,0 +1,890 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css">
+
+
+  <meta name="keywords" content="SpringBoot,Thymeleaf,">
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="牛犊记" type="application/atom+xml">
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1">
+
+
+
+
+
+
+<meta name="description" content="Thymeleaf简介Thymeleaf是⾯向Web和独⽴环境的现代服务器端Java模板引擎，能够处 理HTML，XML，JavaScript，CSS甚⾄纯⽂本。 Thymeleaf旨在提供⼀个优雅的、⾼度可维护的创建模板的⽅式。    为了实 现这⼀⽬标，Thymeleaf建⽴在⾃然模板的概念上，将其逻辑注⼊到模板 ⽂件中，不会影响模板设计原型。    这改善了设计的沟通，弥合了设计和 开发团队">
+<meta name="keywords" content="SpringBoot,Thymeleaf">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Spring Boot 采用Thymeleaf模块及Thymeleaf语法">
+<meta property="og:url" content="http://calfgz.github.io/blog/2017/08/springboot-thymeleaf.html">
+<meta property="og:site_name" content="牛犊记">
+<meta property="og:description" content="Thymeleaf简介Thymeleaf是⾯向Web和独⽴环境的现代服务器端Java模板引擎，能够处 理HTML，XML，JavaScript，CSS甚⾄纯⽂本。 Thymeleaf旨在提供⼀个优雅的、⾼度可维护的创建模板的⽅式。    为了实 现这⼀⽬标，Thymeleaf建⽴在⾃然模板的概念上，将其逻辑注⼊到模板 ⽂件中，不会影响模板设计原型。    这改善了设计的沟通，弥合了设计和 开发团队">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2019-04-28T07:38:07.338Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Spring Boot 采用Thymeleaf模块及Thymeleaf语法">
+<meta name="twitter:description" content="Thymeleaf简介Thymeleaf是⾯向Web和独⽴环境的现代服务器端Java模板引擎，能够处 理HTML，XML，JavaScript，CSS甚⾄纯⽂本。 Thymeleaf旨在提供⼀个优雅的、⾼度可维护的创建模板的⽅式。    为了实 现这⼀⽬标，Thymeleaf建⽴在⾃然模板的概念上，将其逻辑注⼊到模板 ⽂件中，不会影响模板设计原型。    这改善了设计的沟通，弥合了设计和 开发团队">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://calfgz.github.io/blog/2017/08/springboot-thymeleaf.html">
+
+
+
+
+
+  <title>Spring Boot 采用Thymeleaf模块及Thymeleaf语法 | 牛犊记</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?eb8a0170f0ad9db33295cfbe2dc5b699";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">牛犊记</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://calfgz.github.io/blog/2017/08/springboot-thymeleaf.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="calfgz">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="牛犊记">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Spring Boot 采用Thymeleaf模块及Thymeleaf语法</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-08-01T14:19:27+08:00">
+                2017-08-01
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/SpringBoot/" itemprop="url" rel="index">
+                    <span itemprop="name">SpringBoot</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1><span id="thymeleaf简介">Thymeleaf简介</span></h1><p>Thymeleaf是⾯向Web和独⽴环境的现代服务器端Java模板引擎，能够处 理HTML，XML，JavaScript，CSS甚⾄纯⽂本。</p>
+<p>Thymeleaf旨在提供⼀个优雅的、⾼度可维护的创建模板的⽅式。    为了实 现这⼀⽬标，Thymeleaf建⽴在⾃然模板的概念上，将其逻辑注⼊到模板 ⽂件中，不会影响模板设计原型。    这改善了设计的沟通，弥合了设计和 开发团队之间的差距。</p>
+<p>Thymeleaf从设计之初就遵循Web标准——特别是HTML5标准    ，如果需 要，Thymeleaf允许您创建完全符合HTML5验证标准的模板。</p>
+<h1><span id="在spring-boot中使用">在Spring Boot中使用</span></h1><h2><span id="引入依赖">引入依赖</span></h2><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework.boot<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-boot-starter-thymeleaf<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<h2><span id="配置文件">配置文件</span></h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">#thymeleaf start</span><br><span class="line">spring.thymeleaf.mode=HTML5</span><br><span class="line">spring.thymeleaf.encoding=UTF-8</span><br><span class="line">spring.thymeleaf.content-type=text/html</span><br><span class="line">#开发时关闭缓存,不然没法看到实时页面</span><br><span class="line">spring.thymeleaf.cache=false</span><br><span class="line">#thymeleaf end</span><br></pre></td></tr></table></figure>
+<p><code>resources/templates</code>为thymeleaf模板默认路径</p>
+<h2><span id="编写controller">编写Controller</span></h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Controller</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">TestController</span> </span>&#123;</span><br><span class="line">    <span class="meta">@RequestMapping</span>(<span class="string">"/test"</span>)</span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">test</span><span class="params">(ModelMap map)</span> </span>&#123;</span><br><span class="line">        map.addAttribute(<span class="string">"title"</span>, <span class="string">"Hello Thymeleaf!"</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="string">"test"</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2><span id="编写testhtml模块">编写test.html模块</span></h2><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;!DOCTYPE html&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">html</span> <span class="attr">xmlns</span>=<span class="string">"http://www.w3.org/1999/xhtml"</span> <span class="attr">xmlns:th</span>=<span class="string">"http://www.thymeleaf.org"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">head</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">title</span>&gt;</span>测试<span class="tag">&lt;/<span class="name">title</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">head</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">h1</span> <span class="attr">th:text</span>=<span class="string">"$&#123;title&#125;"</span>&gt;</span>标题<span class="tag">&lt;/<span class="name">h1</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">html</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<h1><span id="使用legacyhtml5模板">使用LEGACYHTML5模板</span></h1><p>默认配置下，thymeleaf对.html的内容要求很严格，比如<code>&lt;input name=&quot;id&quot;/&gt;</code>，如果少最后的标签封闭符号/，就会报错而转到错误页。也比如你在使用Vue.js这样的库，然后有<div v-cloak></div>这样的html代码，也会被thymeleaf认为不符合要求而抛出错误。</p>
+<p>解决这个问题可以通过设置thymeleaf模板为<code>LEGACYHTML5</code>可以解决这个问题.<code>LEGACYHTML5</code>需要搭配一个额外的库<code>NekoHTML</code>才可用。</p>
+<h2><span id="引入依赖">引入依赖</span></h2><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>net.sourceforge.nekohtml<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>nekohtml<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">version</span>&gt;</span>1.9.22<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<h2><span id="修改配置文件">修改配置文件</span></h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">#thymeleaf start</span><br><span class="line">#采用LEGCYHTML5模板</span><br><span class="line">spring.thymeleaf.mode=LEGACYHTML5</span><br><span class="line">spring.thymeleaf.encoding=UTF-8</span><br><span class="line">spring.thymeleaf.content-type=text/html</span><br><span class="line">#开发时关闭缓存,不然没法看到实时页面</span><br><span class="line">spring.thymeleaf.cache=false</span><br><span class="line">#thymeleaf end</span><br></pre></td></tr></table></figure>
+<h1><span id="thymeleaf语法">Thymeleaf语法</span></h1><h2><span id="thymeleaf简单表达式">Thymeleaf简单表达式</span></h2><h3><span id="变量表达式">变量表达式</span></h3><p>Thymeleaf模板引擎在进行模板渲染时，还会附带一个Context存放进行模板渲染的变量，在模板中定义的表达式本质上就是从Context中获取对应的变量的值</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">h1</span> <span class="attr">th:text</span>=<span class="string">"$&#123;title&#125;"</span>&gt;</span>标题<span class="tag">&lt;/<span class="name">h1</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<h3><span id="选择星号表达式">选择(星号)表达式</span></h3><p>可以简单理解为内层对外层对象的引用</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">th:object</span>=<span class="string">"$&#123;user&#125;"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">p</span>&gt;</span>Name: <span class="tag">&lt;<span class="name">span</span> <span class="attr">th:text</span>=<span class="string">"*&#123;firstName&#125;"</span>&gt;</span>Sebastian<span class="tag">&lt;/<span class="name">span</span>&gt;</span>.<span class="tag">&lt;/<span class="name">p</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">p</span>&gt;</span>Surname: <span class="tag">&lt;<span class="name">span</span> <span class="attr">th:text</span>=<span class="string">"*&#123;lastName&#125;"</span>&gt;</span>Pepper<span class="tag">&lt;/<span class="name">span</span>&gt;</span>.<span class="tag">&lt;/<span class="name">p</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>以上代码等同于：</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">div</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">p</span>&gt;</span>Name: <span class="tag">&lt;<span class="name">span</span> <span class="attr">th:text</span>=<span class="string">"$&#123;user.firstName&#125;"</span>&gt;</span>Sebastian<span class="tag">&lt;/<span class="name">span</span>&gt;</span>.<span class="tag">&lt;/<span class="name">p</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">p</span>&gt;</span>Surname: <span class="tag">&lt;<span class="name">span</span> <span class="attr">th:text</span>=<span class="string">"$&#123;user.lastName&#125;"</span>&gt;</span>Pepper<span class="tag">&lt;/<span class="name">span</span>&gt;</span>.<span class="tag">&lt;/<span class="name">p</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>如何没有与<code>th:object</code>结合使用，<code>*{}</code>与<code>${}</code>效果一样，因为其范围自动扩展到context。</p>
+<h3><span id="url表达式">URL表达式</span></h3><p>URL表达式指的是把一个有用的上下文或会话信息添加到URL，这个过程经常被叫做URL重写。Thymeleaf对于URL的处理是通过语法@{…}来处理的</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">!—</span> 绝对路径 —&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">"details.html"</span> <span class="attr">th:href</span>=<span class="string">"@&#123;http://127.0.0.1/detail(id=$&#123;id&#125;)&#125;"</span>&gt;</span>view<span class="tag">&lt;/<span class="name">a</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">!—</span> 相对路径 带参数—&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">"details.html"</span> <span class="attr">th:href</span>=<span class="string">"@&#123;/order/details(id=$&#123;id&#125;)&#125;"</span>&gt;</span>view<span class="tag">&lt;/<span class="name">a</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">&lt;!-- 把参数拼进路径中 --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">"details.html"</span> <span class="attr">th:href</span>=<span class="string">"@&#123;/order/&#123;id&#125;/details(id=$&#123;id&#125;)&#125;"</span>&gt;</span>view<span class="tag">&lt;/<span class="name">a</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>Thymeleaf支持相对路径和绝对路径<br>(id=${id})表示将括号内的内容作为URL参数处理<br>@{…}表达式中可以通过{id}访问Context中的id变量<br>@{/order}是Context相关的相对路径，在渲染时会自动添加上当前Web应用的Context名字，假设context名字为app，那么结果应该是/app/order</p>
+<h3><span id="文字国际化表达式">文字国际化表达式</span></h3><p>文字国际化表达式允许我们从一个外部文件获取区域文字信息(.properties)<br>使用Key-Value方式，还可以提供一组参数(可选).</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">#&#123;main.title&#125;</span><br><span class="line">#&#123;message.entrycreated($&#123;entryId&#125;)&#125;</span><br></pre></td></tr></table></figure>
+<p>模板引用:</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">table</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">th</span> <span class="attr">th:text</span>=<span class="string">"#&#123;header.address.city&#125;"</span>&gt;</span>...<span class="tag">&lt;/<span class="name">th</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">th</span> <span class="attr">th:text</span>=<span class="string">"#&#123;header.address.country&#125;"</span>&gt;</span>...<span class="tag">&lt;/<span class="name">th</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">table</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<h2><span id="thymeleaf文本处理">Thymeleaf文本处理</span></h2><h3><span id="字符串拼接">字符串拼接</span></h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">span</span> <span class="attr">th:text</span>=<span class="string">"'Welcome to our application, ' + $&#123;user.name&#125; + '!'"</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<h3><span id="文字替换">文字替换</span></h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">span</span> <span class="attr">th:text</span>=<span class="string">"|Welcome to our application, $&#123;user.name&#125;!|"</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>相比以上两种方式都可以实现字符串合并,但是,|…|中只能包含变量表达式${…}，不能包含其他常量、条件表达式等。</p>
+<h2><span id="thymeleaf表达基本对象">Thymeleaf表达基本对象</span></h2><ul>
+<li><code>#ctx</code>:上下文对象</li>
+<li><code>#vars</code>:上下文变量</li>
+<li><code>#locale</code>:上下文语言环境</li>
+<li><code>#httpServletRequest</code>:(只有在Web上下文)HttpServletRequest对象</li>
+<li><code>#httpSession</code>:(只有在Web上下文)HttpSession对象。</li>
+</ul>
+<p>例如:</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">span</span> <span class="attr">th:text</span>=<span class="string">"$&#123;#locale.country&#125;"</span>&gt;</span>US<span class="tag">&lt;/<span class="name">span</span>&gt;</span>.</span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">th:text</span>=<span class="string">"$&#123;#calendars.format(today,'dd MMMM yyyy')&#125;"</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<h2><span id="表达式预处理">表达式预处理</span></h2><p>表达式预处理，它被定义在_之间：<br><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">#&#123;selection.__$&#123;sel.code&#125;__&#125;</span><br></pre></td></tr></table></figure></p>
+<p><code>${sel.code}</code>将先被执行，结果(假如是AAA)将被看做表达式的一部分被执行,结果为<code>#{selection.AAA}</code>。</p>
+<h2><span id="thymeleaf运算符">Thymeleaf运算符</span></h2><p>在表达式中可以使用各类算术运算符，例如+, -, *, /, %<br><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">th:with</span>=<span class="string">"isEven=($&#123;prodStat.count&#125; % 2 == 0)"</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p>逻辑运算符&gt;, &lt;, &lt;=,&gt;=，==,!=都可以使用<br>需要注意的是使用 &gt; ,&lt;, &gt;=, &lt;=时需要用它的HTML转义符(&gt; gt; &lt; lt; &gt;= ge; gte; &lt;= le; lte; == eq; != ne; neq;)<br><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">th:if</span>=<span class="string">"$&#123;prodStat.count&#125; &amp;gt; 1"</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">th:text</span>=<span class="string">"'Execution mode is ' + ( ($&#123;execMode&#125; == 'dev')? 'Development' : 'Production')"</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p>布尔运算符 and,or</p>
+<h2><span id="thymeleaf循环">Thymeleaf循环</span></h2><p>数据集合必须是可以遍历的，使用<code>th:each</code>标签：<br><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">table</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">tr</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">th</span>&gt;</span>NAME<span class="tag">&lt;/<span class="name">th</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">th</span>&gt;</span>PRICE<span class="tag">&lt;/<span class="name">th</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">th</span>&gt;</span>IN STOCK<span class="tag">&lt;/<span class="name">th</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">tr</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">tr</span> <span class="attr">th:each</span>=<span class="string">"prod : $&#123;prods&#125;"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">td</span> <span class="attr">th:text</span>=<span class="string">"$&#123;prod.name&#125;"</span>&gt;</span>Onions<span class="tag">&lt;/<span class="name">td</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">td</span> <span class="attr">th:text</span>=<span class="string">"$&#123;prod.price&#125;"</span>&gt;</span>2.41<span class="tag">&lt;/<span class="name">td</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">td</span> <span class="attr">th:text</span>=<span class="string">"$&#123;prod.inStock&#125;? #&#123;true&#125; : #&#123;false&#125;"</span>&gt;</span>yes<span class="tag">&lt;/<span class="name">td</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">tr</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">table</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p>被循环渲染的元素<tr>中加入<code>th:each</code>标签<code>th:each=&quot;prod : ${prods}&quot;</code>对集合变量prods进行遍历，对象prod在循环体中可通过表达式访问</tr></p>
+<h2><span id="thymeleaf条件求值">Thymeleaf条件求值</span></h2><h3><span id="ifunless">If/Unless</span></h3><p>Thymeleaf中使用<code>th:if</code>和<code>th:unless</code>属性进行条件判断</p>
+<p>设置标签只有在<code>th:if</code>中条件成立时才显示:<br><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">a</span> <span class="attr">th:href</span>=<span class="string">"@&#123;/login&#125;"</span> <span class="attr">th:unless</span>=<span class="string">$&#123;session.user</span> != <span class="string">null&#125;</span>&gt;</span>Login<span class="tag">&lt;/<span class="name">a</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p><code>th:unless</code>与<code>th:if</code>相反，表达式条件不成立时显示内容。</p>
+<h3><span id="switch">Switch</span></h3><p>多路选择<code>Switch</code>结构,默认属性<code>default</code>,用<code>*</code>表示<br><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">th:switch</span>=<span class="string">"$&#123;user.role&#125;"</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">p</span> <span class="attr">th:case</span>=<span class="string">"'admin'"</span>&gt;</span>User is an administrator<span class="tag">&lt;/<span class="name">p</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">p</span> <span class="attr">th:case</span>=<span class="string">"#&#123;roles.manager&#125;"</span>&gt;</span>User is a manager<span class="tag">&lt;/<span class="name">p</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">p</span> <span class="attr">th:case</span>=<span class="string">"*"</span>&gt;</span>User is some other thing<span class="tag">&lt;/<span class="name">p</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<h3><span id="if-then-else">If-then-else</span></h3><p><code>(if)?(then):else</code> 三元运算符</p>
+<p>三元运算控制<code>class</code>属性选择<br><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">tr</span> <span class="attr">th:class</span>=<span class="string">"$&#123;row.even&#125;? 'even' : 'odd'"</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p>三元运算嵌套<br> <figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">tr</span> <span class="attr">th:class</span>=<span class="string">"$&#123;row.even&#125;? ($&#123;row.first&#125;? 'first' : 'even') : 'odd'"</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p>还可以省略<code>else</code>部分，当表达式结果为<code>false</code>，返回<code>null</code>，否则返回<code>alt</code><br> <figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">tr</span> <span class="attr">th:class</span>=<span class="string">"$&#123;row.even&#125;? 'alt'"</span>&gt;</span><span class="tag">&lt;/<span class="name">tr</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<h3><span id="if-then">If-then</span></h3><p><code>(if) ? (then)</code> ,省略了<code>else</code>部分，如果条件不成立，返回<code>null</code></p>
+<p> 如果第一个表达式的计算结果为null，则取第二个表达式的结果<br> <figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">th:object</span>=<span class="string">"$&#123;session.user&#125;"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">p</span>&gt;</span>Age: <span class="tag">&lt;<span class="name">span</span> <span class="attr">th:text</span>=<span class="string">"*&#123;age&#125;?: '(no age specified)'"</span>&gt;</span>27<span class="tag">&lt;/<span class="name">span</span>&gt;</span>.<span class="tag">&lt;/<span class="name">p</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p>等效于：<br><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">p</span>&gt;</span>Age: <span class="tag">&lt;<span class="name">span</span> <span class="attr">th:text</span>=<span class="string">"*&#123;age != null&#125;? *&#123;age&#125; : '(no age specified)'"</span>&gt;</span>27<span class="tag">&lt;/<span class="name">span</span>&gt;</span>.<span class="tag">&lt;/<span class="name">p</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p>条件表达式嵌套：<br><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">p</span>&gt;</span>Name: <span class="tag">&lt;<span class="name">span</span> <span class="attr">th:text</span>=<span class="string">"*&#123;firstName&#125; ?: (*&#123;admin&#125; ? 'Admin' : #&#123;default.username&#125;)"</span>&gt;</span>Sebastian<span class="tag">&lt;/<span class="name">span</span>&gt;</span>.<span class="tag">&lt;/<span class="name">p</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<h2><span id="expression-utility-objects">Expression Utility Objects</span></h2><p>Thymeleaf提供了套Utility对象,内置于Context中,可通过#直接访问：</p>
+<ul>
+<li><code>#execInfo</code> : expression object providing useful information about the template being processed inside Thymeleaf Standard Expressions.</li>
+<li><code>#uris</code> : utility object for performing URI/URL operations (esp. escaping/unescaping) inside Thymeleaf Standard Expressions.</li>
+<li><code>#conversions</code> : utility object that allows the execution of the Conversion Service at any point of a template</li>
+<li><code>#dates</code>: <code>java.util</code>的实用方法。对象:日期格式、组件提取等.</li>
+<li><code>#calendars</code>: 类似于#日期,但对于<code>java.util</code>。日历对象</li>
+<li><code>#numbers</code>: 格式化数字对象的实用方法。</li>
+<li><code>#strings</code>:字符串对象的实用方法:包含<code>startsWith</code>,将/附加等。</li>
+<li><code>#objects</code>: 实用方法的对象。</li>
+<li><code>#bools</code>: 布尔评价的实用方法。</li>
+<li><code>#arrays</code>: 数组的实用方法。</li>
+<li><code>#lists</code>: list集合。</li>
+<li><code>#sets</code>:set集合。</li>
+<li><code>#maps</code>: map集合。</li>
+<li><code>#aggregates</code>: 实用程序方法用于创建聚集在数组或集合.</li>
+<li><code>#messages</code>: 实用程序方法获取外部信息内部变量表达式,以同样的方式,因为他们将获得使用# {…}语法</li>
+<li><code>#ids</code>: 实用程序方法来处理可能重复的id属性(例如,由于迭代)。</li>
+</ul>
+<h3><span id="execution-info">Execution Info</span></h3><ul>
+<li><code>#execInfo</code> : expression object providing useful information about the template being processed inside Thymeleaf Standard Expressions.<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line">/*</span><br><span class="line"> * ======================================================================</span><br><span class="line"> * See javadoc API for class org.thymeleaf.expression.ExecutionInfo</span><br><span class="line"> * ======================================================================</span><br><span class="line"> */</span><br><span class="line"></span><br><span class="line">/*</span><br><span class="line"> * Return the name and mode of the 'leaf' template. This means the template</span><br><span class="line"> * from where the events being processed were parsed. So if this piece of</span><br><span class="line"> * code is not in the root template "A" but on a fragment being inserted</span><br><span class="line"> * into "A" from another template called "B", this will return "B" as a</span><br><span class="line"> * name, and B's mode as template mode.</span><br><span class="line"> */</span><br><span class="line">$&#123;#execInfo.templateName&#125;</span><br><span class="line">$&#123;#execInfo.templateMode&#125;</span><br><span class="line"></span><br><span class="line">/*</span><br><span class="line"> * Return the name and mode of the 'root' template. This means the template</span><br><span class="line"> * that the template engine was originally asked to process. So if this</span><br><span class="line"> * piece of code is not in the root template "A" but on a fragment being</span><br><span class="line"> * inserted into "A" from another template called "B", this will still </span><br><span class="line"> * return "A" and A's template mode.</span><br><span class="line"> */</span><br><span class="line">$&#123;#execInfo.processedTemplateName&#125;</span><br><span class="line">$&#123;#execInfo.processedTemplateMode&#125;</span><br><span class="line"></span><br><span class="line">/*</span><br><span class="line"> * Return the stacks (actually, List<span class="tag">&lt;<span class="name">String</span>&gt;</span> or List<span class="tag">&lt;<span class="name">TemplateMode</span>&gt;</span>) of</span><br><span class="line"> * templates being processed. The first element will be the </span><br><span class="line"> * 'processedTemplate' (the root one), the last one will be the 'leaf'</span><br><span class="line"> * template, and in the middle all the fragments inserted in nested</span><br><span class="line"> * manner to reach the leaf from the root will appear.</span><br><span class="line"> */</span><br><span class="line">$&#123;#execInfo.templateNames&#125;</span><br><span class="line">$&#123;#execInfo.templateModes&#125;</span><br><span class="line"></span><br><span class="line">/*</span><br><span class="line"> * Return the stack of templates being processed similarly (and in the</span><br><span class="line"> * same order) to 'templateNames' and 'templateModes', but returning</span><br><span class="line"> * a List<span class="tag">&lt;<span class="name">TemplateData</span>&gt;</span> with the full template metadata.</span><br><span class="line"> */</span><br><span class="line">$&#123;#execInfo.templateStack&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h3><span id="messages">Messages</span></h3><ul>
+<li><code>#messages</code> : utility methods for obtaining externalized messages inside variables expressions, in the same way as they would be obtained using #{…} syntax.<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">/*</span><br><span class="line"> * ======================================================================</span><br><span class="line"> * See javadoc API for class org.thymeleaf.expression.Messages</span><br><span class="line"> * ======================================================================</span><br><span class="line"> */</span><br><span class="line"></span><br><span class="line">/*</span><br><span class="line"> * Obtain externalized messages. Can receive a single key, a key plus arguments,</span><br><span class="line"> * or an array/list/set of keys (in which case it will return an array/list/set of </span><br><span class="line"> * externalized messages).</span><br><span class="line"> * If a message is not found, a default message (like '??msgKey??') is returned.</span><br><span class="line"> */</span><br><span class="line">$&#123;#messages.msg('msgKey')&#125;</span><br><span class="line">$&#123;#messages.msg('msgKey', param1)&#125;</span><br><span class="line">$&#123;#messages.msg('msgKey', param1, param2)&#125;</span><br><span class="line">$&#123;#messages.msg('msgKey', param1, param2, param3)&#125;</span><br><span class="line">$&#123;#messages.msgWithParams('msgKey', new Object[] &#123;param1, param2, param3, param4&#125;)&#125;</span><br><span class="line">$&#123;#messages.arrayMsg(messageKeyArray)&#125;</span><br><span class="line">$&#123;#messages.listMsg(messageKeyList)&#125;</span><br><span class="line">$&#123;#messages.setMsg(messageKeySet)&#125;</span><br><span class="line"></span><br><span class="line">/*</span><br><span class="line"> * Obtain externalized messages or null. Null is returned instead of a default</span><br><span class="line"> * message if a message for the specified key is not found.</span><br><span class="line"> */</span><br><span class="line">$&#123;#messages.msgOrNull('msgKey')&#125;</span><br><span class="line">$&#123;#messages.msgOrNull('msgKey', param1)&#125;</span><br><span class="line">$&#123;#messages.msgOrNull('msgKey', param1, param2)&#125;</span><br><span class="line">$&#123;#messages.msgOrNull('msgKey', param1, param2, param3)&#125;</span><br><span class="line">$&#123;#messages.msgOrNullWithParams('msgKey', new Object[] &#123;param1, param2, param3, param4&#125;)&#125;</span><br><span class="line">$&#123;#messages.arrayMsgOrNull(messageKeyArray)&#125;</span><br><span class="line">$&#123;#messages.listMsgOrNull(messageKeyList)&#125;</span><br><span class="line">$&#123;#messages.setMsgOrNull(messageKeySet)&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h3><span id="urisurls">URIs/URLs</span></h3><ul>
+<li><code>#uris</code> : utility object for performing URI/URL operations (esp. escaping/unescaping) inside Thymeleaf Standard Expressions.<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line">/*</span><br><span class="line"> * ======================================================================</span><br><span class="line"> * See javadoc API for class org.thymeleaf.expression.Uris</span><br><span class="line"> * ======================================================================</span><br><span class="line"> */</span><br><span class="line"></span><br><span class="line">/*</span><br><span class="line"> * Escape/Unescape as a URI/URL path</span><br><span class="line"> */</span><br><span class="line">$&#123;#uris.escapePath(uri)&#125;</span><br><span class="line">$&#123;#uris.escapePath(uri, encoding)&#125;</span><br><span class="line">$&#123;#uris.unescapePath(uri)&#125;</span><br><span class="line">$&#123;#uris.unescapePath(uri, encoding)&#125;</span><br><span class="line"></span><br><span class="line">/*</span><br><span class="line"> * Escape/Unescape as a URI/URL path segment (between '/' symbols)</span><br><span class="line"> */</span><br><span class="line">$&#123;#uris.escapePathSegment(uri)&#125;</span><br><span class="line">$&#123;#uris.escapePathSegment(uri, encoding)&#125;</span><br><span class="line">$&#123;#uris.unescapePathSegment(uri)&#125;</span><br><span class="line">$&#123;#uris.unescapePathSegment(uri, encoding)&#125;</span><br><span class="line"></span><br><span class="line">/*</span><br><span class="line"> * Escape/Unescape as a Fragment Identifier (#frag)</span><br><span class="line"> */</span><br><span class="line">$&#123;#uris.escapeFragmentId(uri)&#125;</span><br><span class="line">$&#123;#uris.escapeFragmentId(uri, encoding)&#125;</span><br><span class="line">$&#123;#uris.unescapeFragmentId(uri)&#125;</span><br><span class="line">$&#123;#uris.unescapeFragmentId(uri, encoding)&#125;</span><br><span class="line"></span><br><span class="line">/*</span><br><span class="line"> * Escape/Unescape as a Query Parameter (?var=value)</span><br><span class="line"> */</span><br><span class="line">$&#123;#uris.escapeQueryParam(uri)&#125;</span><br><span class="line">$&#123;#uris.escapeQueryParam(uri, encoding)&#125;</span><br><span class="line">$&#123;#uris.unescapeQueryParam(uri)&#125;</span><br><span class="line">$&#123;#uris.unescapeQueryParam(uri, encoding)&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h3><span id="conversions">Conversions</span></h3><ul>
+<li><code>#conversions</code> : utility object that allows the execution of the Conversion Service at any point of a template:<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br></pre></td><td class="code"><pre><span class="line">/*</span><br><span class="line"> * ======================================================================</span><br><span class="line"> * See javadoc API for class org.thymeleaf.expression.Conversions</span><br><span class="line"> * ======================================================================</span><br><span class="line"> */</span><br><span class="line"></span><br><span class="line">/*</span><br><span class="line"> * Execute the desired conversion of the 'object' value into the</span><br><span class="line"> * specified class.</span><br><span class="line"> */</span><br><span class="line">$&#123;#conversions.convert(object, 'java.util.TimeZone')&#125;</span><br><span class="line">$&#123;#conversions.convert(object, targetClass)&#125;</span><br><span class="line">Dates</span><br><span class="line"></span><br><span class="line">#dates : utility methods for java.util.Date objects:</span><br><span class="line">/*</span><br><span class="line"> * ======================================================================</span><br><span class="line"> * See javadoc API for class org.thymeleaf.expression.Dates</span><br><span class="line"> * ======================================================================</span><br><span class="line"> */</span><br><span class="line"></span><br><span class="line">/*</span><br><span class="line"> * Format date with the standard locale format</span><br><span class="line"> * Also works with arrays, lists or sets</span><br><span class="line"> */</span><br><span class="line">$&#123;#dates.format(date)&#125;</span><br><span class="line">$&#123;#dates.arrayFormat(datesArray)&#125;</span><br><span class="line">$&#123;#dates.listFormat(datesList)&#125;</span><br><span class="line">$&#123;#dates.setFormat(datesSet)&#125;</span><br><span class="line"></span><br><span class="line">/*</span><br><span class="line"> * Format date with the ISO8601 format</span><br><span class="line"> * Also works with arrays, lists or sets</span><br><span class="line"> */</span><br><span class="line">$&#123;#dates.formatISO(date)&#125;</span><br><span class="line">$&#123;#dates.arrayFormatISO(datesArray)&#125;</span><br><span class="line">$&#123;#dates.listFormatISO(datesList)&#125;</span><br><span class="line">$&#123;#dates.setFormatISO(datesSet)&#125;</span><br><span class="line"></span><br><span class="line">/*</span><br><span class="line"> * Format date with the specified pattern</span><br><span class="line"> * Also works with arrays, lists or sets</span><br><span class="line"> */</span><br><span class="line">$&#123;#dates.format(date, 'dd/MMM/yyyy HH:mm')&#125;</span><br><span class="line">$&#123;#dates.arrayFormat(datesArray, 'dd/MMM/yyyy HH:mm')&#125;</span><br><span class="line">$&#123;#dates.listFormat(datesList, 'dd/MMM/yyyy HH:mm')&#125;</span><br><span class="line">$&#123;#dates.setFormat(datesSet, 'dd/MMM/yyyy HH:mm')&#125;</span><br><span class="line"></span><br><span class="line">/*</span><br><span class="line"> * Obtain date properties</span><br><span class="line"> * Also works with arrays, lists or sets</span><br><span class="line"> */</span><br><span class="line">$&#123;#dates.day(date)&#125;                    // also arrayDay(...), listDay(...), etc.</span><br><span class="line">$&#123;#dates.month(date)&#125;                  // also arrayMonth(...), listMonth(...), etc.</span><br><span class="line">$&#123;#dates.monthName(date)&#125;              // also arrayMonthName(...), listMonthName(...), etc.</span><br><span class="line">$&#123;#dates.monthNameShort(date)&#125;         // also arrayMonthNameShort(...), listMonthNameShort(...), etc.</span><br><span class="line">$&#123;#dates.year(date)&#125;                   // also arrayYear(...), listYear(...), etc.</span><br><span class="line">$&#123;#dates.dayOfWeek(date)&#125;              // also arrayDayOfWeek(...), listDayOfWeek(...), etc.</span><br><span class="line">$&#123;#dates.dayOfWeekName(date)&#125;          // also arrayDayOfWeekName(...), listDayOfWeekName(...), etc.</span><br><span class="line">$&#123;#dates.dayOfWeekNameShort(date)&#125;     // also arrayDayOfWeekNameShort(...), listDayOfWeekNameShort(...), etc.</span><br><span class="line">$&#123;#dates.hour(date)&#125;                   // also arrayHour(...), listHour(...), etc.</span><br><span class="line">$&#123;#dates.minute(date)&#125;                 // also arrayMinute(...), listMinute(...), etc.</span><br><span class="line">$&#123;#dates.second(date)&#125;                 // also arraySecond(...), listSecond(...), etc.</span><br><span class="line">$&#123;#dates.millisecond(date)&#125;            // also arrayMillisecond(...), listMillisecond(...), etc.</span><br><span class="line"></span><br><span class="line">/*</span><br><span class="line"> * Create date (java.util.Date) objects from its components</span><br><span class="line"> */</span><br><span class="line">$&#123;#dates.create(year,month,day)&#125;</span><br><span class="line">$&#123;#dates.create(year,month,day,hour,minute)&#125;</span><br><span class="line">$&#123;#dates.create(year,month,day,hour,minute,second)&#125;</span><br><span class="line">$&#123;#dates.create(year,month,day,hour,minute,second,millisecond)&#125;</span><br><span class="line"></span><br><span class="line">/*</span><br><span class="line"> * Create a date (java.util.Date) object for the current date and time</span><br><span class="line"> */</span><br><span class="line">$&#123;#dates.createNow()&#125;</span><br><span class="line"></span><br><span class="line">$&#123;#dates.createNowForTimeZone()&#125;</span><br><span class="line"></span><br><span class="line">/*</span><br><span class="line"> * Create a date (java.util.Date) object for the current date (time set to 00:00)</span><br><span class="line"> */</span><br><span class="line">$&#123;#dates.createToday()&#125;</span><br><span class="line"></span><br><span class="line">$&#123;#dates.createTodayForTimeZone()&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h3><span id="calendars">Calendars</span></h3><ul>
+<li><code>#calendars</code> : analogous to #dates, but for java.util.Calendar objects:<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br></pre></td><td class="code"><pre><span class="line">/*</span><br><span class="line"> * ======================================================================</span><br><span class="line"> * See javadoc API for class org.thymeleaf.expression.Calendars</span><br><span class="line"> * ======================================================================</span><br><span class="line"> */</span><br><span class="line"></span><br><span class="line">/*</span><br><span class="line"> * Format calendar with the standard locale format</span><br><span class="line"> * Also works with arrays, lists or sets</span><br><span class="line"> */</span><br><span class="line">$&#123;#calendars.format(cal)&#125;</span><br><span class="line">$&#123;#calendars.arrayFormat(calArray)&#125;</span><br><span class="line">$&#123;#calendars.listFormat(calList)&#125;</span><br><span class="line">$&#123;#calendars.setFormat(calSet)&#125;</span><br><span class="line"></span><br><span class="line">/*</span><br><span class="line"> * Format calendar with the ISO8601 format</span><br><span class="line"> * Also works with arrays, lists or sets</span><br><span class="line"> */</span><br><span class="line">$&#123;#calendars.formatISO(cal)&#125;</span><br><span class="line">$&#123;#calendars.arrayFormatISO(calArray)&#125;</span><br><span class="line">$&#123;#calendars.listFormatISO(calList)&#125;</span><br><span class="line">$&#123;#calendars.setFormatISO(calSet)&#125;</span><br><span class="line"></span><br><span class="line">/*</span><br><span class="line"> * Format calendar with the specified pattern</span><br><span class="line"> * Also works with arrays, lists or sets</span><br><span class="line"> */</span><br><span class="line">$&#123;#calendars.format(cal, 'dd/MMM/yyyy HH:mm')&#125;</span><br><span class="line">$&#123;#calendars.arrayFormat(calArray, 'dd/MMM/yyyy HH:mm')&#125;</span><br><span class="line">$&#123;#calendars.listFormat(calList, 'dd/MMM/yyyy HH:mm')&#125;</span><br><span class="line">$&#123;#calendars.setFormat(calSet, 'dd/MMM/yyyy HH:mm')&#125;</span><br><span class="line"></span><br><span class="line">/*</span><br><span class="line"> * Obtain calendar properties</span><br><span class="line"> * Also works with arrays, lists or sets</span><br><span class="line"> */</span><br><span class="line">$&#123;#calendars.day(date)&#125;                // also arrayDay(...), listDay(...), etc.</span><br><span class="line">$&#123;#calendars.month(date)&#125;              // also arrayMonth(...), listMonth(...), etc.</span><br><span class="line">$&#123;#calendars.monthName(date)&#125;          // also arrayMonthName(...), listMonthName(...), etc.</span><br><span class="line">$&#123;#calendars.monthNameShort(date)&#125;     // also arrayMonthNameShort(...), listMonthNameShort(...), etc.</span><br><span class="line">$&#123;#calendars.year(date)&#125;               // also arrayYear(...), listYear(...), etc.</span><br><span class="line">$&#123;#calendars.dayOfWeek(date)&#125;          // also arrayDayOfWeek(...), listDayOfWeek(...), etc.</span><br><span class="line">$&#123;#calendars.dayOfWeekName(date)&#125;      // also arrayDayOfWeekName(...), listDayOfWeekName(...), etc.</span><br><span class="line">$&#123;#calendars.dayOfWeekNameShort(date)&#125; // also arrayDayOfWeekNameShort(...), listDayOfWeekNameShort(...), etc.</span><br><span class="line">$&#123;#calendars.hour(date)&#125;               // also arrayHour(...), listHour(...), etc.</span><br><span class="line">$&#123;#calendars.minute(date)&#125;             // also arrayMinute(...), listMinute(...), etc.</span><br><span class="line">$&#123;#calendars.second(date)&#125;             // also arraySecond(...), listSecond(...), etc.</span><br><span class="line">$&#123;#calendars.millisecond(date)&#125;        // also arrayMillisecond(...), listMillisecond(...), etc.</span><br><span class="line"></span><br><span class="line">/*</span><br><span class="line"> * Create calendar (java.util.Calendar) objects from its components</span><br><span class="line"> */</span><br><span class="line">$&#123;#calendars.create(year,month,day)&#125;</span><br><span class="line">$&#123;#calendars.create(year,month,day,hour,minute)&#125;</span><br><span class="line">$&#123;#calendars.create(year,month,day,hour,minute,second)&#125;</span><br><span class="line">$&#123;#calendars.create(year,month,day,hour,minute,second,millisecond)&#125;</span><br><span class="line"></span><br><span class="line">$&#123;#calendars.createForTimeZone(year,month,day,timeZone)&#125;</span><br><span class="line">$&#123;#calendars.createForTimeZone(year,month,day,hour,minute,timeZone)&#125;</span><br><span class="line">$&#123;#calendars.createForTimeZone(year,month,day,hour,minute,second,timeZone)&#125;</span><br><span class="line">$&#123;#calendars.createForTimeZone(year,month,day,hour,minute,second,millisecond,timeZone)&#125;</span><br><span class="line"></span><br><span class="line">/*</span><br><span class="line"> * Create a calendar (java.util.Calendar) object for the current date and time</span><br><span class="line"> */</span><br><span class="line">$&#123;#calendars.createNow()&#125;</span><br><span class="line"></span><br><span class="line">$&#123;#calendars.createNowForTimeZone()&#125;</span><br><span class="line"></span><br><span class="line">/*</span><br><span class="line"> * Create a calendar (java.util.Calendar) object for the current date (time set to 00:00)</span><br><span class="line"> */</span><br><span class="line">$&#123;#calendars.createToday()&#125;</span><br><span class="line"></span><br><span class="line">$&#123;#calendars.createTodayForTimeZone()&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h3><span id="numbers">Numbers</span></h3><ul>
+<li><code>#numbers</code> : utility methods for number objects:<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br></pre></td><td class="code"><pre><span class="line">/*</span><br><span class="line"> * ======================================================================</span><br><span class="line"> * See javadoc API for class org.thymeleaf.expression.Numbers</span><br><span class="line"> * ======================================================================</span><br><span class="line"> */</span><br><span class="line"></span><br><span class="line">/*</span><br><span class="line"> * ==========================</span><br><span class="line"> * Formatting integer numbers</span><br><span class="line"> * ==========================</span><br><span class="line"> */</span><br><span class="line"></span><br><span class="line">/* </span><br><span class="line"> * Set minimum integer digits.</span><br><span class="line"> * Also works with arrays, lists or sets</span><br><span class="line"> */</span><br><span class="line">$&#123;#numbers.formatInteger(num,3)&#125;</span><br><span class="line">$&#123;#numbers.arrayFormatInteger(numArray,3)&#125;</span><br><span class="line">$&#123;#numbers.listFormatInteger(numList,3)&#125;</span><br><span class="line">$&#123;#numbers.setFormatInteger(numSet,3)&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">/* </span><br><span class="line"> * Set minimum integer digits and thousands separator: </span><br><span class="line"> * 'POINT', 'COMMA', 'WHITESPACE', 'NONE' or 'DEFAULT' (by locale).</span><br><span class="line"> * Also works with arrays, lists or sets</span><br><span class="line"> */</span><br><span class="line">$&#123;#numbers.formatInteger(num,3,'POINT')&#125;</span><br><span class="line">$&#123;#numbers.arrayFormatInteger(numArray,3,'POINT')&#125;</span><br><span class="line">$&#123;#numbers.listFormatInteger(numList,3,'POINT')&#125;</span><br><span class="line">$&#123;#numbers.setFormatInteger(numSet,3,'POINT')&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">/*</span><br><span class="line"> * ==========================</span><br><span class="line"> * Formatting decimal numbers</span><br><span class="line"> * ==========================</span><br><span class="line"> */</span><br><span class="line"></span><br><span class="line">/*</span><br><span class="line"> * Set minimum integer digits and (exact) decimal digits.</span><br><span class="line"> * Also works with arrays, lists or sets</span><br><span class="line"> */</span><br><span class="line">$&#123;#numbers.formatDecimal(num,3,2)&#125;</span><br><span class="line">$&#123;#numbers.arrayFormatDecimal(numArray,3,2)&#125;</span><br><span class="line">$&#123;#numbers.listFormatDecimal(numList,3,2)&#125;</span><br><span class="line">$&#123;#numbers.setFormatDecimal(numSet,3,2)&#125;</span><br><span class="line"></span><br><span class="line">/*</span><br><span class="line"> * Set minimum integer digits and (exact) decimal digits, and also decimal separator.</span><br><span class="line"> * Also works with arrays, lists or sets</span><br><span class="line"> */</span><br><span class="line">$&#123;#numbers.formatDecimal(num,3,2,'COMMA')&#125;</span><br><span class="line">$&#123;#numbers.arrayFormatDecimal(numArray,3,2,'COMMA')&#125;</span><br><span class="line">$&#123;#numbers.listFormatDecimal(numList,3,2,'COMMA')&#125;</span><br><span class="line">$&#123;#numbers.setFormatDecimal(numSet,3,2,'COMMA')&#125;</span><br><span class="line"></span><br><span class="line">/*</span><br><span class="line"> * Set minimum integer digits and (exact) decimal digits, and also thousands and </span><br><span class="line"> * decimal separator.</span><br><span class="line"> * Also works with arrays, lists or sets</span><br><span class="line"> */</span><br><span class="line">$&#123;#numbers.formatDecimal(num,3,'POINT',2,'COMMA')&#125;</span><br><span class="line">$&#123;#numbers.arrayFormatDecimal(numArray,3,'POINT',2,'COMMA')&#125;</span><br><span class="line">$&#123;#numbers.listFormatDecimal(numList,3,'POINT',2,'COMMA')&#125;</span><br><span class="line">$&#123;#numbers.setFormatDecimal(numSet,3,'POINT',2,'COMMA')&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">/* </span><br><span class="line"> * =====================</span><br><span class="line"> * Formatting currencies</span><br><span class="line"> * =====================</span><br><span class="line"> */</span><br><span class="line"></span><br><span class="line">$&#123;#numbers.formatCurrency(num)&#125;</span><br><span class="line">$&#123;#numbers.arrayFormatCurrency(numArray)&#125;</span><br><span class="line">$&#123;#numbers.listFormatCurrency(numList)&#125;</span><br><span class="line">$&#123;#numbers.setFormatCurrency(numSet)&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">/* </span><br><span class="line"> * ======================</span><br><span class="line"> * Formatting percentages</span><br><span class="line"> * ======================</span><br><span class="line"> */</span><br><span class="line"></span><br><span class="line">$&#123;#numbers.formatPercent(num)&#125;</span><br><span class="line">$&#123;#numbers.arrayFormatPercent(numArray)&#125;</span><br><span class="line">$&#123;#numbers.listFormatPercent(numList)&#125;</span><br><span class="line">$&#123;#numbers.setFormatPercent(numSet)&#125;</span><br><span class="line"></span><br><span class="line">/* </span><br><span class="line"> * Set minimum integer digits and (exact) decimal digits.</span><br><span class="line"> */</span><br><span class="line">$&#123;#numbers.formatPercent(num, 3, 2)&#125;</span><br><span class="line">$&#123;#numbers.arrayFormatPercent(numArray, 3, 2)&#125;</span><br><span class="line">$&#123;#numbers.listFormatPercent(numList, 3, 2)&#125;</span><br><span class="line">$&#123;#numbers.setFormatPercent(numSet, 3, 2)&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">/*</span><br><span class="line"> * ===============</span><br><span class="line"> * Utility methods</span><br><span class="line"> * ===============</span><br><span class="line"> */</span><br><span class="line"></span><br><span class="line">/*</span><br><span class="line"> * Create a sequence (array) of integer numbers going</span><br><span class="line"> * from x to y</span><br><span class="line"> */</span><br><span class="line">$&#123;#numbers.sequence(from,to)&#125;</span><br><span class="line">$&#123;#numbers.sequence(from,to,step)&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h3><span id="strings">Strings</span></h3><ul>
+<li><code>#strings</code> : utility methods for String objects:<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br></pre></td><td class="code"><pre><span class="line">/*</span><br><span class="line"> * ======================================================================</span><br><span class="line"> * See javadoc API for class org.thymeleaf.expression.Strings</span><br><span class="line"> * ======================================================================</span><br><span class="line"> */</span><br><span class="line"></span><br><span class="line">/*</span><br><span class="line"> * Null-safe toString()</span><br><span class="line"> */</span><br><span class="line">$&#123;#strings.toString(obj)&#125;                           // also array*, list* and set*</span><br><span class="line"></span><br><span class="line">/*</span><br><span class="line"> * Check whether a String is empty (or null). Performs a trim() operation before check</span><br><span class="line"> * Also works with arrays, lists or sets</span><br><span class="line"> */</span><br><span class="line">$&#123;#strings.isEmpty(name)&#125;</span><br><span class="line">$&#123;#strings.arrayIsEmpty(nameArr)&#125;</span><br><span class="line">$&#123;#strings.listIsEmpty(nameList)&#125;</span><br><span class="line">$&#123;#strings.setIsEmpty(nameSet)&#125;</span><br><span class="line"></span><br><span class="line">/*</span><br><span class="line"> * Perform an 'isEmpty()' check on a string and return it if false, defaulting to</span><br><span class="line"> * another specified string if true.</span><br><span class="line"> * Also works with arrays, lists or sets</span><br><span class="line"> */</span><br><span class="line">$&#123;#strings.defaultString(text,default)&#125;</span><br><span class="line">$&#123;#strings.arrayDefaultString(textArr,default)&#125;</span><br><span class="line">$&#123;#strings.listDefaultString(textList,default)&#125;</span><br><span class="line">$&#123;#strings.setDefaultString(textSet,default)&#125;</span><br><span class="line"></span><br><span class="line">/*</span><br><span class="line"> * Check whether a fragment is contained in a String</span><br><span class="line"> * Also works with arrays, lists or sets</span><br><span class="line"> */</span><br><span class="line">$&#123;#strings.contains(name,'ez')&#125;                     // also array*, list* and set*</span><br><span class="line">$&#123;#strings.containsIgnoreCase(name,'ez')&#125;           // also array*, list* and set*</span><br><span class="line"></span><br><span class="line">/*</span><br><span class="line"> * Check whether a String starts or ends with a fragment</span><br><span class="line"> * Also works with arrays, lists or sets</span><br><span class="line"> */</span><br><span class="line">$&#123;#strings.startsWith(name,'Don')&#125;                  // also array*, list* and set*</span><br><span class="line">$&#123;#strings.endsWith(name,endingFragment)&#125;           // also array*, list* and set*</span><br><span class="line"></span><br><span class="line">/*</span><br><span class="line"> * Substring-related operations</span><br><span class="line"> * Also works with arrays, lists or sets</span><br><span class="line"> */</span><br><span class="line">$&#123;#strings.indexOf(name,frag)&#125;                      // also array*, list* and set*</span><br><span class="line">$&#123;#strings.substring(name,3,5)&#125;                     // also array*, list* and set*</span><br><span class="line">$&#123;#strings.substringAfter(name,prefix)&#125;             // also array*, list* and set*</span><br><span class="line">$&#123;#strings.substringBefore(name,suffix)&#125;            // also array*, list* and set*</span><br><span class="line">$&#123;#strings.replace(name,'las','ler')&#125;               // also array*, list* and set*</span><br><span class="line"></span><br><span class="line">/*</span><br><span class="line"> * Append and prepend</span><br><span class="line"> * Also works with arrays, lists or sets</span><br><span class="line"> */</span><br><span class="line">$&#123;#strings.prepend(str,prefix)&#125;                     // also array*, list* and set*</span><br><span class="line">$&#123;#strings.append(str,suffix)&#125;                      // also array*, list* and set*</span><br><span class="line"></span><br><span class="line">/*</span><br><span class="line"> * Change case</span><br><span class="line"> * Also works with arrays, lists or sets</span><br><span class="line"> */</span><br><span class="line">$&#123;#strings.toUpperCase(name)&#125;                       // also array*, list* and set*</span><br><span class="line">$&#123;#strings.toLowerCase(name)&#125;                       // also array*, list* and set*</span><br><span class="line"></span><br><span class="line">/*</span><br><span class="line"> * Split and join</span><br><span class="line"> */</span><br><span class="line">$&#123;#strings.arrayJoin(namesArray,',')&#125;</span><br><span class="line">$&#123;#strings.listJoin(namesList,',')&#125;</span><br><span class="line">$&#123;#strings.setJoin(namesSet,',')&#125;</span><br><span class="line">$&#123;#strings.arraySplit(namesStr,',')&#125;                // returns String[]</span><br><span class="line">$&#123;#strings.listSplit(namesStr,',')&#125;                 // returns List<span class="tag">&lt;<span class="name">String</span>&gt;</span></span><br><span class="line">$&#123;#strings.setSplit(namesStr,',')&#125;                  // returns Set<span class="tag">&lt;<span class="name">String</span>&gt;</span></span><br><span class="line"></span><br><span class="line">/*</span><br><span class="line"> * Trim</span><br><span class="line"> * Also works with arrays, lists or sets</span><br><span class="line"> */</span><br><span class="line">$&#123;#strings.trim(str)&#125;                               // also array*, list* and set*</span><br><span class="line"></span><br><span class="line">/*</span><br><span class="line"> * Compute length</span><br><span class="line"> * Also works with arrays, lists or sets</span><br><span class="line"> */</span><br><span class="line">$&#123;#strings.length(str)&#125;                             // also array*, list* and set*</span><br><span class="line"></span><br><span class="line">/*</span><br><span class="line"> * Abbreviate text making it have a maximum size of n. If text is bigger, it</span><br><span class="line"> * will be clipped and finished in "..."</span><br><span class="line"> * Also works with arrays, lists or sets</span><br><span class="line"> */</span><br><span class="line">$&#123;#strings.abbreviate(str,10)&#125;                      // also array*, list* and set*</span><br><span class="line"></span><br><span class="line">/*</span><br><span class="line"> * Convert the first character to upper-case (and vice-versa)</span><br><span class="line"> */</span><br><span class="line">$&#123;#strings.capitalize(str)&#125;                         // also array*, list* and set*</span><br><span class="line">$&#123;#strings.unCapitalize(str)&#125;                       // also array*, list* and set*</span><br><span class="line"></span><br><span class="line">/*</span><br><span class="line"> * Convert the first character of every word to upper-case</span><br><span class="line"> */</span><br><span class="line">$&#123;#strings.capitalizeWords(str)&#125;                    // also array*, list* and set*</span><br><span class="line">$&#123;#strings.capitalizeWords(str,delimiters)&#125;         // also array*, list* and set*</span><br><span class="line"></span><br><span class="line">/*</span><br><span class="line"> * Escape the string</span><br><span class="line"> */</span><br><span class="line">$&#123;#strings.escapeXml(str)&#125;                          // also array*, list* and set*</span><br><span class="line">$&#123;#strings.escapeJava(str)&#125;                         // also array*, list* and set*</span><br><span class="line">$&#123;#strings.escapeJavaScript(str)&#125;                   // also array*, list* and set*</span><br><span class="line">$&#123;#strings.unescapeJava(str)&#125;                       // also array*, list* and set*</span><br><span class="line">$&#123;#strings.unescapeJavaScript(str)&#125;                 // also array*, list* and set*</span><br><span class="line"></span><br><span class="line">/*</span><br><span class="line"> * Null-safe comparison and concatenation</span><br><span class="line"> */</span><br><span class="line">$&#123;#strings.equals(first, second)&#125;</span><br><span class="line">$&#123;#strings.equalsIgnoreCase(first, second)&#125;</span><br><span class="line">$&#123;#strings.concat(values...)&#125;</span><br><span class="line">$&#123;#strings.concatReplaceNulls(nullValue, values...)&#125;</span><br><span class="line"></span><br><span class="line">/*</span><br><span class="line"> * Random</span><br><span class="line"> */</span><br><span class="line">$&#123;#strings.randomAlphanumeric(count)&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h3><span id="objects">Objects</span></h3><ul>
+<li><code>#objects</code> : utility methods for objects in general<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br></pre></td><td class="code"><pre><span class="line">/*</span><br><span class="line"> * ======================================================================</span><br><span class="line"> * See javadoc API for class org.thymeleaf.expression.Objects</span><br><span class="line"> * ======================================================================</span><br><span class="line"> */</span><br><span class="line"></span><br><span class="line">/*</span><br><span class="line"> * Return obj if it is not null, and default otherwise</span><br><span class="line"> * Also works with arrays, lists or sets</span><br><span class="line"> */</span><br><span class="line">$&#123;#objects.nullSafe(obj,default)&#125;</span><br><span class="line">$&#123;#objects.arrayNullSafe(objArray,default)&#125;</span><br><span class="line">$&#123;#objects.listNullSafe(objList,default)&#125;</span><br><span class="line">$&#123;#objects.setNullSafe(objSet,default)&#125;</span><br><span class="line">Booleans</span><br><span class="line"></span><br><span class="line">#bools : utility methods for boolean evaluation</span><br><span class="line">/*</span><br><span class="line"> * ======================================================================</span><br><span class="line"> * See javadoc API for class org.thymeleaf.expression.Bools</span><br><span class="line"> * ======================================================================</span><br><span class="line"> */</span><br><span class="line"></span><br><span class="line">/*</span><br><span class="line"> * Evaluate a condition in the same way that it would be evaluated in a th:if tag</span><br><span class="line"> * (see conditional evaluation chapter afterwards).</span><br><span class="line"> * Also works with arrays, lists or sets</span><br><span class="line"> */</span><br><span class="line">$&#123;#bools.isTrue(obj)&#125;</span><br><span class="line">$&#123;#bools.arrayIsTrue(objArray)&#125;</span><br><span class="line">$&#123;#bools.listIsTrue(objList)&#125;</span><br><span class="line">$&#123;#bools.setIsTrue(objSet)&#125;</span><br><span class="line"></span><br><span class="line">/*</span><br><span class="line"> * Evaluate with negation</span><br><span class="line"> * Also works with arrays, lists or sets</span><br><span class="line"> */</span><br><span class="line">$&#123;#bools.isFalse(cond)&#125;</span><br><span class="line">$&#123;#bools.arrayIsFalse(condArray)&#125;</span><br><span class="line">$&#123;#bools.listIsFalse(condList)&#125;</span><br><span class="line">$&#123;#bools.setIsFalse(condSet)&#125;</span><br><span class="line"></span><br><span class="line">/*</span><br><span class="line"> * Evaluate and apply AND operator</span><br><span class="line"> * Receive an array, a list or a set as parameter</span><br><span class="line"> */</span><br><span class="line">$&#123;#bools.arrayAnd(condArray)&#125;</span><br><span class="line">$&#123;#bools.listAnd(condList)&#125;</span><br><span class="line">$&#123;#bools.setAnd(condSet)&#125;</span><br><span class="line"></span><br><span class="line">/*</span><br><span class="line"> * Evaluate and apply OR operator</span><br><span class="line"> * Receive an array, a list or a set as parameter</span><br><span class="line"> */</span><br><span class="line">$&#123;#bools.arrayOr(condArray)&#125;</span><br><span class="line">$&#123;#bools.listOr(condList)&#125;</span><br><span class="line">$&#123;#bools.setOr(condSet)&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h3><span id="arrays">Arrays</span></h3><ul>
+<li><code>#arrays</code> : utility methods for arrays<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line">/*</span><br><span class="line"> * ======================================================================</span><br><span class="line"> * See javadoc API for class org.thymeleaf.expression.Arrays</span><br><span class="line"> * ======================================================================</span><br><span class="line"> */</span><br><span class="line"></span><br><span class="line">/*</span><br><span class="line"> * Converts to array, trying to infer array component class.</span><br><span class="line"> * Note that if resulting array is empty, or if the elements</span><br><span class="line"> * of the target object are not all of the same class,</span><br><span class="line"> * this method will return Object[].</span><br><span class="line"> */</span><br><span class="line">$&#123;#arrays.toArray(object)&#125;</span><br><span class="line"></span><br><span class="line">/*</span><br><span class="line"> * Convert to arrays of the specified component class.</span><br><span class="line"> */</span><br><span class="line">$&#123;#arrays.toStringArray(object)&#125;</span><br><span class="line">$&#123;#arrays.toIntegerArray(object)&#125;</span><br><span class="line">$&#123;#arrays.toLongArray(object)&#125;</span><br><span class="line">$&#123;#arrays.toDoubleArray(object)&#125;</span><br><span class="line">$&#123;#arrays.toFloatArray(object)&#125;</span><br><span class="line">$&#123;#arrays.toBooleanArray(object)&#125;</span><br><span class="line"></span><br><span class="line">/*</span><br><span class="line"> * Compute length</span><br><span class="line"> */</span><br><span class="line">$&#123;#arrays.length(array)&#125;</span><br><span class="line"></span><br><span class="line">/*</span><br><span class="line"> * Check whether array is empty</span><br><span class="line"> */</span><br><span class="line">$&#123;#arrays.isEmpty(array)&#125;</span><br><span class="line"></span><br><span class="line">/*</span><br><span class="line"> * Check if element or elements are contained in array</span><br><span class="line"> */</span><br><span class="line">$&#123;#arrays.contains(array, element)&#125;</span><br><span class="line">$&#123;#arrays.containsAll(array, elements)&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h3><span id="lists">Lists</span></h3><ul>
+<li><code>#lists</code> : utility methods for lists<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">/*</span><br><span class="line"> * ======================================================================</span><br><span class="line"> * See javadoc API for class org.thymeleaf.expression.Lists</span><br><span class="line"> * ======================================================================</span><br><span class="line"> */</span><br><span class="line"></span><br><span class="line">/*</span><br><span class="line"> * Converts to list</span><br><span class="line"> */</span><br><span class="line">$&#123;#lists.toList(object)&#125;</span><br><span class="line"></span><br><span class="line">/*</span><br><span class="line"> * Compute size</span><br><span class="line"> */</span><br><span class="line">$&#123;#lists.size(list)&#125;</span><br><span class="line"></span><br><span class="line">/*</span><br><span class="line"> * Check whether list is empty</span><br><span class="line"> */</span><br><span class="line">$&#123;#lists.isEmpty(list)&#125;</span><br><span class="line"></span><br><span class="line">/*</span><br><span class="line"> * Check if element or elements are contained in list</span><br><span class="line"> */</span><br><span class="line">$&#123;#lists.contains(list, element)&#125;</span><br><span class="line">$&#123;#lists.containsAll(list, elements)&#125;</span><br><span class="line"></span><br><span class="line">/*</span><br><span class="line"> * Sort a copy of the given list. The members of the list must implement</span><br><span class="line"> * comparable or you must define a comparator.</span><br><span class="line"> */</span><br><span class="line">$&#123;#lists.sort(list)&#125;</span><br><span class="line">$&#123;#lists.sort(list, comparator)&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h3><span id="sets">Sets</span></h3><ul>
+<li><code>#sets</code> : utility methods for sets<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">/*</span><br><span class="line"> * ======================================================================</span><br><span class="line"> * See javadoc API for class org.thymeleaf.expression.Sets</span><br><span class="line"> * ======================================================================</span><br><span class="line"> */</span><br><span class="line"></span><br><span class="line">/*</span><br><span class="line"> * Converts to set</span><br><span class="line"> */</span><br><span class="line">$&#123;#sets.toSet(object)&#125;</span><br><span class="line"></span><br><span class="line">/*</span><br><span class="line"> * Compute size</span><br><span class="line"> */</span><br><span class="line">$&#123;#sets.size(set)&#125;</span><br><span class="line"></span><br><span class="line">/*</span><br><span class="line"> * Check whether set is empty</span><br><span class="line"> */</span><br><span class="line">$&#123;#sets.isEmpty(set)&#125;</span><br><span class="line"></span><br><span class="line">/*</span><br><span class="line"> * Check if element or elements are contained in set</span><br><span class="line"> */</span><br><span class="line">$&#123;#sets.contains(set, element)&#125;</span><br><span class="line">$&#123;#sets.containsAll(set, elements)&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h3><span id="maps">Maps</span></h3><ul>
+<li><code>#maps</code> : utility methods for maps<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">/*</span><br><span class="line"> * ======================================================================</span><br><span class="line"> * See javadoc API for class org.thymeleaf.expression.Maps</span><br><span class="line"> * ======================================================================</span><br><span class="line"> */</span><br><span class="line"></span><br><span class="line">/*</span><br><span class="line"> * Compute size</span><br><span class="line"> */</span><br><span class="line">$&#123;#maps.size(map)&#125;</span><br><span class="line"></span><br><span class="line">/*</span><br><span class="line"> * Check whether map is empty</span><br><span class="line"> */</span><br><span class="line">$&#123;#maps.isEmpty(map)&#125;</span><br><span class="line"></span><br><span class="line">/*</span><br><span class="line"> * Check if key/s or value/s are contained in maps</span><br><span class="line"> */</span><br><span class="line">$&#123;#maps.containsKey(map, key)&#125;</span><br><span class="line">$&#123;#maps.containsAllKeys(map, keys)&#125;</span><br><span class="line">$&#123;#maps.containsValue(map, value)&#125;</span><br><span class="line">$&#123;#maps.containsAllValues(map, value)&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h3><span id="aggregates">Aggregates</span></h3><ul>
+<li><code>#aggregates</code> : utility methods for creating aggregates on arrays or collections<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">/*</span><br><span class="line"> * ======================================================================</span><br><span class="line"> * See javadoc API for class org.thymeleaf.expression.Aggregates</span><br><span class="line"> * ======================================================================</span><br><span class="line"> */</span><br><span class="line"></span><br><span class="line">/*</span><br><span class="line"> * Compute sum. Returns null if array or collection is empty</span><br><span class="line"> */</span><br><span class="line">$&#123;#aggregates.sum(array)&#125;</span><br><span class="line">$&#123;#aggregates.sum(collection)&#125;</span><br><span class="line"></span><br><span class="line">/*</span><br><span class="line"> * Compute average. Returns null if array or collection is empty</span><br><span class="line"> */</span><br><span class="line">$&#123;#aggregates.avg(array)&#125;</span><br><span class="line">$&#123;#aggregates.avg(collection)&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h3><span id="ids">IDs</span></h3><ul>
+<li><code>#ids</code> : utility methods for dealing with id attributes that might be repeated (for example, as a result of an iteration).<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">/*</span><br><span class="line"> * ======================================================================</span><br><span class="line"> * See javadoc API for class org.thymeleaf.expression.Ids</span><br><span class="line"> * ======================================================================</span><br><span class="line"> */</span><br><span class="line"></span><br><span class="line">/*</span><br><span class="line"> * Normally used in th:id attributes, for appending a counter to the id attribute value</span><br><span class="line"> * so that it remains unique even when involved in an iteration process.</span><br><span class="line"> */</span><br><span class="line">$&#123;#ids.seq('someId')&#125;</span><br><span class="line"></span><br><span class="line">/*</span><br><span class="line"> * Normally used in th:for attributes in <span class="tag">&lt;<span class="name">label</span>&gt;</span> tags, so that these labels can refer to Ids</span><br><span class="line"> * generated by means if the #ids.seq(...) function.</span><br><span class="line"> *</span><br><span class="line"> * Depending on whether the <span class="tag">&lt;<span class="name">label</span>&gt;</span> goes before or after the element with the #ids.seq(...)</span><br><span class="line"> * function, the "next" (label goes before "seq") or the "prev" function (label goes after </span><br><span class="line"> * "seq") function should be called.</span><br><span class="line"> */</span><br><span class="line">$&#123;#ids.next('someId')&#125;</span><br><span class="line">$&#123;#ids.prev('someId')&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>参考资料:<a href="http://www.thymeleaf.org/doc/tutorials/3.0/usingthymeleaf.html" target="_blank" rel="noopener">Thymeleaf文档</a></p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/SpringBoot/" rel="tag"># SpringBoot</a>
+          
+            <a href="/tags/Thymeleaf/" rel="tag"># Thymeleaf</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/blog/2017/07/aop-aspect-log.html" rel="next" title="Spring Boot 采用自定义注解方式实现AOP日志记录">
+                <i class="fa fa-chevron-left"></i> Spring Boot 采用自定义注解方式实现AOP日志记录
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/blog/2017/08/springboot-restful-HttpMessageNotWritableException.html" rel="prev" title="Spring Boot搭建Restful API输出Json数据异常">
+                Spring Boot搭建Restful API输出Json数据异常 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image" src="/images/avatar.gif" alt="calfgz">
+          <p class="site-author-name" itemprop="name">calfgz</p>
+           
+              <p class="site-description motion-element" itemprop="description">Draw my work with code</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">29</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">9</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">31</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/calfgz" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#undefined"><span class="nav-number">1.</span> <span class="nav-text">Thymeleaf简介</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#undefined"><span class="nav-number">2.</span> <span class="nav-text">在Spring Boot中使用</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#undefined"><span class="nav-number">2.1.</span> <span class="nav-text">引入依赖</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#undefined"><span class="nav-number">2.2.</span> <span class="nav-text">配置文件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#undefined"><span class="nav-number">2.3.</span> <span class="nav-text">编写Controller</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#undefined"><span class="nav-number">2.4.</span> <span class="nav-text">编写test.html模块</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#undefined"><span class="nav-number">3.</span> <span class="nav-text">使用LEGACYHTML5模板</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#undefined"><span class="nav-number">3.1.</span> <span class="nav-text">引入依赖</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#undefined"><span class="nav-number">3.2.</span> <span class="nav-text">修改配置文件</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#undefined"><span class="nav-number">4.</span> <span class="nav-text">Thymeleaf语法</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#undefined"><span class="nav-number">4.1.</span> <span class="nav-text">Thymeleaf简单表达式</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#undefined"><span class="nav-number">4.1.1.</span> <span class="nav-text">变量表达式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#undefined"><span class="nav-number">4.1.2.</span> <span class="nav-text">选择(星号)表达式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#undefined"><span class="nav-number">4.1.3.</span> <span class="nav-text">URL表达式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#undefined"><span class="nav-number">4.1.4.</span> <span class="nav-text">文字国际化表达式</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#undefined"><span class="nav-number">4.2.</span> <span class="nav-text">Thymeleaf文本处理</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#undefined"><span class="nav-number">4.2.1.</span> <span class="nav-text">字符串拼接</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#undefined"><span class="nav-number">4.2.2.</span> <span class="nav-text">文字替换</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#undefined"><span class="nav-number">4.3.</span> <span class="nav-text">Thymeleaf表达基本对象</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#undefined"><span class="nav-number">4.4.</span> <span class="nav-text">表达式预处理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#undefined"><span class="nav-number">4.5.</span> <span class="nav-text">Thymeleaf运算符</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#undefined"><span class="nav-number">4.6.</span> <span class="nav-text">Thymeleaf循环</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#undefined"><span class="nav-number">4.7.</span> <span class="nav-text">Thymeleaf条件求值</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#undefined"><span class="nav-number">4.7.1.</span> <span class="nav-text">If/Unless</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#undefined"><span class="nav-number">4.7.2.</span> <span class="nav-text">Switch</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#undefined"><span class="nav-number">4.7.3.</span> <span class="nav-text">If-then-else</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#undefined"><span class="nav-number">4.7.4.</span> <span class="nav-text">If-then</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#undefined"><span class="nav-number">4.8.</span> <span class="nav-text">Expression Utility Objects</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#undefined"><span class="nav-number">4.8.1.</span> <span class="nav-text">Execution Info</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#undefined"><span class="nav-number">4.8.2.</span> <span class="nav-text">Messages</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#undefined"><span class="nav-number">4.8.3.</span> <span class="nav-text">URIs/URLs</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#undefined"><span class="nav-number">4.8.4.</span> <span class="nav-text">Conversions</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#undefined"><span class="nav-number">4.8.5.</span> <span class="nav-text">Calendars</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#undefined"><span class="nav-number">4.8.6.</span> <span class="nav-text">Numbers</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#undefined"><span class="nav-number">4.8.7.</span> <span class="nav-text">Strings</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#undefined"><span class="nav-number">4.8.8.</span> <span class="nav-text">Objects</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#undefined"><span class="nav-number">4.8.9.</span> <span class="nav-text">Arrays</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#undefined"><span class="nav-number">4.8.10.</span> <span class="nav-text">Lists</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#undefined"><span class="nav-number">4.8.11.</span> <span class="nav-text">Sets</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#undefined"><span class="nav-number">4.8.12.</span> <span class="nav-text">Maps</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#undefined"><span class="nav-number">4.8.13.</span> <span class="nav-text">Aggregates</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#undefined"><span class="nav-number">4.8.14.</span> <span class="nav-text">IDs</span></a></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy;  2017 - 
+  <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">calfgz</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

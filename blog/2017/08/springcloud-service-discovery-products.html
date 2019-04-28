@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css">
+
+
+  <meta name="keywords" content="SpringCloud,Consul,Zookeeper,Eureka,">
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="牛犊记" type="application/atom+xml">
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1">
+
+
+
+
+
+
+<meta name="description" content="这里就平时经常用到的服务发现的产品进行下特性的对比，首先看下结论:    Feature Consul zookeeper etcd euerka     服务健康检查 服务状态，内存，硬盘等 (弱)长连接，keepalive 连接心跳 可配支持   多数据中心 支持 — — —   kv存储服务 支持 支持 支持 —   一致性 raft paxos raft —   cap ca cp cp">
+<meta name="keywords" content="SpringCloud,Consul,Zookeeper,Eureka">
+<meta property="og:type" content="article">
+<meta property="og:title" content="服务发现比较:Consul vs Zookeeper vs Etcd vs Eureka">
+<meta property="og:url" content="http://calfgz.github.io/blog/2017/08/springcloud-service-discovery-products.html">
+<meta property="og:site_name" content="牛犊记">
+<meta property="og:description" content="这里就平时经常用到的服务发现的产品进行下特性的对比，首先看下结论:    Feature Consul zookeeper etcd euerka     服务健康检查 服务状态，内存，硬盘等 (弱)长连接，keepalive 连接心跳 可配支持   多数据中心 支持 — — —   kv存储服务 支持 支持 支持 —   一致性 raft paxos raft —   cap ca cp cp">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2019-04-28T07:38:07.339Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="服务发现比较:Consul vs Zookeeper vs Etcd vs Eureka">
+<meta name="twitter:description" content="这里就平时经常用到的服务发现的产品进行下特性的对比，首先看下结论:    Feature Consul zookeeper etcd euerka     服务健康检查 服务状态，内存，硬盘等 (弱)长连接，keepalive 连接心跳 可配支持   多数据中心 支持 — — —   kv存储服务 支持 支持 支持 —   一致性 raft paxos raft —   cap ca cp cp">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://calfgz.github.io/blog/2017/08/springcloud-service-discovery-products.html">
+
+
+
+
+
+  <title>服务发现比较:Consul vs Zookeeper vs Etcd vs Eureka | 牛犊记</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?eb8a0170f0ad9db33295cfbe2dc5b699";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">牛犊记</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://calfgz.github.io/blog/2017/08/springcloud-service-discovery-products.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="calfgz">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="牛犊记">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">服务发现比较:Consul vs Zookeeper vs Etcd vs Eureka</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-08-07T15:02:28+08:00">
+                2017-08-07
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/SpringCloud/" itemprop="url" rel="index">
+                    <span itemprop="name">SpringCloud</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>这里就平时经常用到的服务发现的产品进行下特性的对比，首先看下结论:</p>
+<table>
+<thead>
+<tr>
+<th>Feature</th>
+<th style="text-align:right">Consul</th>
+<th style="text-align:center">zookeeper</th>
+<th style="text-align:center">etcd</th>
+<th style="text-align:center">euerka</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>服务健康检查</td>
+<td style="text-align:right">服务状态，内存，硬盘等</td>
+<td style="text-align:center">(弱)长连接，keepalive</td>
+<td style="text-align:center">连接心跳</td>
+<td style="text-align:center">可配支持</td>
+</tr>
+<tr>
+<td>多数据中心</td>
+<td style="text-align:right">支持</td>
+<td style="text-align:center">—</td>
+<td style="text-align:center">—</td>
+<td style="text-align:center">—</td>
+</tr>
+<tr>
+<td>kv存储服务</td>
+<td style="text-align:right">支持</td>
+<td style="text-align:center">支持</td>
+<td style="text-align:center">支持</td>
+<td style="text-align:center">—</td>
+</tr>
+<tr>
+<td>一致性</td>
+<td style="text-align:right">raft</td>
+<td style="text-align:center">paxos</td>
+<td style="text-align:center">raft</td>
+<td style="text-align:center">—</td>
+</tr>
+<tr>
+<td>cap</td>
+<td style="text-align:right">ca</td>
+<td style="text-align:center">cp</td>
+<td style="text-align:center">cp</td>
+<td style="text-align:center">ap</td>
+</tr>
+<tr>
+<td>使用接口(多语言能力)</td>
+<td style="text-align:right">支持http和dns</td>
+<td style="text-align:center">客户端</td>
+<td style="text-align:center">http/grpc</td>
+<td style="text-align:center">http（sidecar）</td>
+</tr>
+<tr>
+<td>watch支持</td>
+<td style="text-align:right">全量/支持long polling</td>
+<td style="text-align:center">支持</td>
+<td style="text-align:center">支持 long polling</td>
+<td style="text-align:center">支持 long polling/大部分增量</td>
+</tr>
+<tr>
+<td>自身监控</td>
+<td style="text-align:right">metrics</td>
+<td style="text-align:center">—</td>
+<td style="text-align:center">metrics</td>
+<td style="text-align:center">metrics</td>
+</tr>
+<tr>
+<td>安全</td>
+<td style="text-align:right">acl/https</td>
+<td style="text-align:center">acl</td>
+<td style="text-align:center">https支持（弱）</td>
+<td style="text-align:center">—</td>
+</tr>
+<tr>
+<td>spring cloud集成</td>
+<td style="text-align:right">已支持</td>
+<td style="text-align:center">已支持</td>
+<td style="text-align:center">已支持</td>
+<td style="text-align:center">已支持</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><p>服务的健康检查<br><code>Euraka</code> 使用时需要显式配置健康检查支持；<code>Zookeeper</code>,<code>Etcd</code> 则在失去了和服务进程的连接情况下任务不健康，而<code>Consul</code>相对更为详细点，比如内存是否已使用了90%，文件系统的空间是不是快不足了。</p>
+</li>
+<li><p>多数据中心支持<br><code>Consul</code> 通过 <code>WAN</code> 的 <code>Gossip</code> 协议，完成跨数据中心的同步；而且其他的产品则需要额外的开发工作来实现；</p>
+</li>
+<li><p>KV 存储服务<br>除了 <code>Eureka</code> ,其他几款都能够对外支持 k-v 的存储服务，所以后面会讲到这几款产品追求高一致性的重要原因。而提供存储服务，也能够较好的转化为动态配置服务哦。</p>
+</li>
+<li><p>产品设计中 CAP 理论的取舍<br><code>Eureka</code> 典型的 AP,作为分布式场景下的服务发现的产品较为合适，服务发现场景的可用性优先级较高，一致性并不是特别致命。其次 CA 类型的场景 <code>Consul</code>,也能提供较高的可用性，并能 <code>k-v</code> <code>store</code> 服务保证一致性。 而<code>Zookeeper</code>,<code>Etcd</code>则是CP类型 牺牲可用性，在服务发现场景并没太大优势；</p>
+</li>
+<li><p>多语言能力与对外提供服务的接入协议<br><code>Zookeeper</code>的跨语言支持较弱，其他几款支持 <code>http</code> 提供接入的可能。<code>Euraka</code> 一般通过 <code>sidecar</code>的方式提供多语言客户端的接入支持。<code>Etcd</code> 还提供了<code>Grpc</code>的支持。 <code>Consul</code>除了标准的Rest服务api,还提供了DNS的支持。</p>
+</li>
+<li><p>Watch的支持（客户端观察到服务提供者变化）<br><code>Zookeeper</code> 支持服务器端推送变化，<code>Eureka 2.0</code>(正在开发中)也计划支持。 <code>Eureka 1</code>,<code>Consul</code>,<code>Etcd</code>则都通过长轮询的方式来实现变化的感知；</p>
+</li>
+<li><p>自身集群的监控<br>除了 <code>Zookeeper</code> ,其他几款都默认支持 <code>metrics</code>，运维者可以搜集并报警这些度量信息达到监控目的；</p>
+</li>
+<li><p>安全<br><code>Consul</code>,<code>Zookeeper</code> 支持ACL，另外 <code>Consul</code>,<code>Etcd</code> 支持安全通道<code>https</code>.</p>
+</li>
+<li><p>SpringCloud的集成<br>目前都有相对应的 <code>boot starter</code>，提供了集成能力。</p>
+</li>
+</ul>
+<p>总的来看，目前<code>Consul</code> 自身功能，和 <code>SpringCloud</code> 对其集成的支持都相对较为完善，而且运维的复杂度较为简单（没有详细列出讨论），<code>Eureka</code> 设计上比较符合场景，但还需持续的完善。</p>
+<p>转载 : <a href="https://luyiisme.github.io/2017/04/22/spring-cloud-service-discovery-products/" target="_blank" rel="noopener">Luyi’s Blog</a></p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/SpringCloud/" rel="tag"># SpringCloud</a>
+          
+            <a href="/tags/Consul/" rel="tag"># Consul</a>
+          
+            <a href="/tags/Zookeeper/" rel="tag"># Zookeeper</a>
+          
+            <a href="/tags/Eureka/" rel="tag"># Eureka</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/blog/2017/08/springboot-restful-HttpMessageNotWritableException.html" rel="next" title="Spring Boot搭建Restful API输出Json数据异常">
+                <i class="fa fa-chevron-left"></i> Spring Boot搭建Restful API输出Json数据异常
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/blog/2017/08/java-jvm.html" rel="prev" title="JVM调优—GC 长时间停顿问题及解决方法">
+                JVM调优—GC 长时间停顿问题及解决方法 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+
+      <section class="site-overview sidebar-panel sidebar-panel-active">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image" src="/images/avatar.gif" alt="calfgz">
+          <p class="site-author-name" itemprop="name">calfgz</p>
+           
+              <p class="site-description motion-element" itemprop="description">Draw my work with code</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">29</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">9</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">31</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/calfgz" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy;  2017 - 
+  <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">calfgz</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

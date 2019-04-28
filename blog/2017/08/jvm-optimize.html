@@ -1,0 +1,786 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css">
+
+
+  <meta name="keywords" content="Java,JVM,">
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="牛犊记" type="application/atom+xml">
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1">
+
+
+
+
+
+
+<meta name="description" content="背景最近发现线上某应用从8月初开始重启越来越频繁，折腾了近一周，过程有点曲折，这里记录一下大概过程。 线上情况线上服务器平时运行良好，只是在某个瞬间服务器负载突然飙升，检测脚本检测应用请求无响应自动对应用进行重启操作。重启瞬间服务器负载突然升高，得并不太高，流量也比平时高一倍左右，后台日志并无报错信息。线上虚拟机配置：4核CPU，5G内存；JDK版本：1.6 排查DUMP日志分析根据dump下来的">
+<meta name="keywords" content="Java,JVM">
+<meta property="og:type" content="article">
+<meta property="og:title" content="记一次JVM调优过程">
+<meta property="og:url" content="http://calfgz.github.io/blog/2017/08/jvm-optimize.html">
+<meta property="og:site_name" content="牛犊记">
+<meta property="og:description" content="背景最近发现线上某应用从8月初开始重启越来越频繁，折腾了近一周，过程有点曲折，这里记录一下大概过程。 线上情况线上服务器平时运行良好，只是在某个瞬间服务器负载突然飙升，检测脚本检测应用请求无响应自动对应用进行重启操作。重启瞬间服务器负载突然升高，得并不太高，流量也比平时高一倍左右，后台日志并无报错信息。线上虚拟机配置：4核CPU，5G内存；JDK版本：1.6 排查DUMP日志分析根据dump下来的">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://calfgz.github.io/images/jvm-optimize/001.jpg">
+<meta property="og:image" content="http://calfgz.github.io/images/jvm-optimize/002.jpg">
+<meta property="og:image" content="http://calfgz.github.io/images/jvm-optimize/003.jpg">
+<meta property="og:updated_time" content="2019-04-28T07:38:07.340Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="记一次JVM调优过程">
+<meta name="twitter:description" content="背景最近发现线上某应用从8月初开始重启越来越频繁，折腾了近一周，过程有点曲折，这里记录一下大概过程。 线上情况线上服务器平时运行良好，只是在某个瞬间服务器负载突然飙升，检测脚本检测应用请求无响应自动对应用进行重启操作。重启瞬间服务器负载突然升高，得并不太高，流量也比平时高一倍左右，后台日志并无报错信息。线上虚拟机配置：4核CPU，5G内存；JDK版本：1.6 排查DUMP日志分析根据dump下来的">
+<meta name="twitter:image" content="http://calfgz.github.io/images/jvm-optimize/001.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://calfgz.github.io/blog/2017/08/jvm-optimize.html">
+
+
+
+
+
+  <title>记一次JVM调优过程 | 牛犊记</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?eb8a0170f0ad9db33295cfbe2dc5b699";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">牛犊记</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://calfgz.github.io/blog/2017/08/jvm-optimize.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="calfgz">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="牛犊记">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">记一次JVM调优过程</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-08-18T11:36:10+08:00">
+                2017-08-18
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/JVM/" itemprop="url" rel="index">
+                    <span itemprop="name">JVM</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2><span id="背景">背景</span></h2><p>最近发现线上某应用从8月初开始重启越来越频繁，折腾了近一周，过程有点曲折，这里记录一下大概过程。</p>
+<h2><span id="线上情况">线上情况</span></h2><p>线上服务器平时运行良好，只是在某个瞬间服务器负载突然飙升，检测脚本检测应用请求无响应自动对应用进行重启操作。<br>重启瞬间服务器负载突然升高，得并不太高，流量也比平时高一倍左右，后台日志并无报错信息。<br>线上虚拟机配置：4核CPU，5G内存；<br>JDK版本：1.6</p>
+<h2><span id="排查">排查</span></h2><h3><span id="dump日志分析">DUMP日志分析</span></h3><p>根据dump下来的文件分析95%的线程都在等待同一个资源。<br><img src="/images/jvm-optimize/001.jpg" alt="dump文件分析线程等待"><br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">"http-app-a-8080-145<span class="variable">$893127005</span>"</span> daemon prio=10 tid=0x00002aab4c0f3400 nid=0x4b36 <span class="keyword">in</span> Object.wait() [0x0000000044719000..0x000000004471ac10]</span><br><span class="line">   java.lang.Thread.State: TIMED_WAITING (on object monitor)</span><br><span class="line">	at java.lang.Object.wait(Native Method)</span><br><span class="line">	- waiting on &lt;0x00002aaacfd05698&gt; (a java.util.ArrayList)</span><br><span class="line">	at com.caucho.jca.ConnectionPool.create(ConnectionPool.java:913)</span><br><span class="line">	- locked &lt;0x00002aaacfd05698&gt; (a java.util.ArrayList)</span><br><span class="line">	at com.caucho.jca.ConnectionPool.allocatePool(ConnectionPool.java:795)</span><br><span class="line">	at com.caucho.jca.ConnectionPool.allocate(ConnectionPool.java:756)</span><br><span class="line">	at com.caucho.jca.ConnectionPool.allocateConnection(ConnectionPool.java:567)</span><br><span class="line">	at com.caucho.sql.DataSourceImpl.getConnection(DataSourceImpl.java:65)</span><br><span class="line">	at com.caucho.sql.DBPool.getConnection(DBPool.java:701)</span><br><span class="line">	at org.springframework.jdbc.datasource.DataSourceUtils.doGetConnection(DataSourceUtils.java:113)</span><br><span class="line">	at org.springframework.jdbc.datasource.DataSourceUtils.getConnection(DataSourceUtils.java:79)</span><br><span class="line">	at org.springframework.jdbc.core.JdbcTemplate.execute(JdbcTemplate.java:577)</span><br><span class="line">	at org.springframework.jdbc.core.JdbcTemplate.query(JdbcTemplate.java:641)</span><br><span class="line">	at org.springframework.jdbc.core.JdbcTemplate.query(JdbcTemplate.java:670)</span><br><span class="line">	at org.springframework.jdbc.core.JdbcTemplate.query(JdbcTemplate.java:678)</span><br><span class="line">	at org.springframework.jdbc.core.JdbcTemplate.query(JdbcTemplate.java:710)</span><br><span class="line">	at org.springframework.jdbc.core.simple.SimpleJdbcTemplate.query(SimpleJdbcTemplate.java:187)</span><br><span class="line">   Locked ownable synchronizers:</span><br><span class="line">	- None</span><br></pre></td></tr></table></figure></p>
+<h3><span id="gc分析">GC分析</span></h3><p>从GC统计看，Eden区和Old代都是100%。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">procs -----------memory---------- ---swap-- -----io---- --system-- -----cpu------</span><br><span class="line"> r  b   swpd   free   buff  cache   si   so    bi    bo   <span class="keyword">in</span>   cs us sy id wa st</span><br><span class="line"> 1  0     92 377528 186180 1639548    0    0     0    22    0    0  8  2 90  0  0</span><br><span class="line"> 1  0     92 377536 186180 1639588    0    0     0    15 1714  794 26  2 72  0  0</span><br><span class="line"> 1  0     92 377884 186180 1639612    0    0     0    87 1759 7236 44  5 51  0  0</span><br><span class="line">  S0     S1     E      O      P     YGC     YGCT    FGC    FGCT     GCT</span><br><span class="line">100.00   0.00 100.00 100.00  53.23    805  206.792    85  315.321  522.113</span><br><span class="line">100.00   0.00 100.00 100.00  53.23    805  206.792    86  326.422  533.214</span><br><span class="line">100.00   0.00 100.00 100.00  53.23    805  206.792    86  326.422  533.214</span><br></pre></td></tr></table></figure>
+<p>打开JVM的GC详情日志后发现，GC日志偶尔会出现并发模式失败(<code>concurrent mode failure</code>)的错误，在应用重启前Old代使用比例迅速升高，然后频繁进行Full GC操作，Full GC伴随着<code>concurrent mode failure</code>错误，Old代使用空间一直没法缩小，最终造成应用无响应而重启。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br></pre></td><td class="code"><pre><span class="line">165481.820: [CMS-concurrent-mark-start]</span><br><span class="line">165481.847: [GC 165481.847: [ParNew: 419456K-&gt;52416K(471872K), 0.1388080 secs] 1678939K-&gt;1315679K(2044736K), 0.1389840 secs] [Times: user=0.30 sys=0.00, real=0.14 secs] </span><br><span class="line">165482.711: [GC 165482.711: [ParNew: 471872K-&gt;52416K(471872K), 0.2897670 secs] 1735135K-&gt;1415603K(2044736K), 0.2901120 secs] [Times: user=0.68 sys=0.04, real=0.30 secs] </span><br><span class="line">165484.160: [GC 165484.160: [ParNew: 471872K-&gt;52416K(471872K), 0.1511710 secs] 1835059K-&gt;1468617K(2044736K), 0.1514160 secs] [Times: user=0.35 sys=0.01, real=0.15 secs] </span><br><span class="line">165485.025: [GC 165485.025: [ParNew: 471872K-&gt;52416K(471872K), 0.1989200 secs] 1888073K-&gt;1513178K(2044736K), 0.1991520 secs] [Times: user=0.48 sys=0.02, real=0.20 secs] </span><br><span class="line">165485.499: [CMS-concurrent-mark: 2.867/3.678 secs] [Times: user=10.39 sys=0.60, real=3.68 secs] </span><br><span class="line">165485.499: [CMS-concurrent-preclean-start]</span><br><span class="line">165485.597: [CMS-concurrent-preclean: 0.095/0.098 secs] [Times: user=0.29 sys=0.05, real=0.10 secs] </span><br><span class="line">165485.597: [CMS-concurrent-abortable-preclean-start]</span><br><span class="line">165486.287: [GC 165486.287: [ParNew: 471872K-&gt;52416K(471872K), 0.4610860 secs] 1932634K-&gt;1567513K(2044736K), 0.4614320 secs] [Times: user=1.01 sys=0.05, real=0.46 secs] </span><br><span class="line">165486.938: [CMS-concurrent-abortable-preclean: 0.580/1.341 secs] [Times: user=4.14 sys=0.28, real=1.34 secs] </span><br><span class="line">165486.941: [GC[YG occupancy: 128659 K (471872 K)]165486.941: [Rescan (parallel) , 0.2358900 secs]165487.177: [weak refs processing, 0.0020640 secs] [1 CMS-remark: 1515097K(1572864K)] 1643757K(2044736K), 0.2381370 secs] [Times: user=0.47 sys=0.01, real=0.24 secs] </span><br><span class="line">165487.181: [CMS-concurrent-sweep-start]</span><br><span class="line">165488.042: [Full GC 165488.043: [CMS165488.518: [CMS-concurrent-sweep: 1.213/1.337 secs] [Times: user=3.37 sys=0.23, real=1.34 secs] </span><br><span class="line"> (concurrent mode failure) (concurrent mode failure): 1514835K-&gt;1485873K(1572864K), 0.4853610 secs] 1986707K-&gt;1957745K(2044736K), [CMS Perm : 81695K-&gt;81695K(136412K)], 0.4856970 secs] [Times: user=0.37 sys=0.01, real=0.48 secs] </span><br><span class="line">165488.532: [GC 165488.532: [ParNew: 471872K-&gt;44512K(471872K), 0.3130160 secs] 1957745K-&gt;1573798K(2044736K), 0.3133460 secs] [Times: user=0.75 sys=0.02, real=0.31 secs] </span><br><span class="line">165489.568: [Full GC 165489.568: [CMS[Unloading class sun.reflect.GeneratedMethodAccessor1602]</span><br><span class="line">[Unloading class sun.reflect.GeneratedMethodAccessor1597]</span><br><span class="line">[Unloading class sun.reflect.GeneratedMethodAccessor1592]</span><br><span class="line">[Unloading class sun.reflect.GeneratedMethodAccessor1594]</span><br><span class="line">[Unloading class sun.reflect.GeneratedMethodAccessor1598]</span><br><span class="line">[Unloading class sun.reflect.GeneratedMethodAccessor1555]</span><br><span class="line">[Unloading class sun.reflect.GeneratedMethodAccessor1599]</span><br><span class="line">[Unloading class sun.reflect.GeneratedMethodAccessor1600]</span><br><span class="line">[Unloading class sun.reflect.GeneratedSerializationConstructorAccessor77]</span><br><span class="line">[Unloading class sun.reflect.GeneratedMethodAccessor1604]</span><br><span class="line">[Unloading class sun.reflect.GeneratedMethodAccessor1593]</span><br><span class="line">[Unloading class sun.reflect.GeneratedMethodAccessor1603]</span><br><span class="line">[Unloading class sun.reflect.GeneratedSerializationConstructorAccessor75]</span><br><span class="line">[Unloading class sun.reflect.GeneratedMethodAccessor1596]</span><br><span class="line">[Unloading class sun.reflect.GeneratedMethodAccessor1595]</span><br><span class="line">[Unloading class sun.reflect.GeneratedMethodAccessor1567]</span><br><span class="line">[Unloading class sun.reflect.GeneratedMethodAccessor395]</span><br><span class="line">[Unloading class sun.reflect.GeneratedMethodAccessor1601]</span><br><span class="line">[Unloading class sun.reflect.GeneratedSerializationConstructorAccessor26]</span><br><span class="line">: 1529286K-&gt;1392790K(1572864K), 4.5172760 secs] 1993254K-&gt;1392790K(2044736K), [CMS Perm : 81695K-&gt;81629K(136412K)], 4.5176710 secs] [Times: user=4.44 sys=0.02, real=4.52 secs] </span><br><span class="line">165494.145: [GC [1 CMS-initial-mark: 1392790K(1572864K)] 1414063K(2044736K), 0.2010890 secs] [Times: user=0.20 sys=0.00, real=0.20 secs] </span><br><span class="line">165494.347: [CMS-concurrent-mark-start]</span><br><span class="line">165495.237: [GC 165495.237: [ParNew: 419456K-&gt;52416K(471872K), 0.2333590 secs] 1812246K-&gt;1460179K(2044736K), 0.2337080 secs] [Times: user=0.50 sys=0.01, real=0.23 secs] </span><br><span class="line">165496.118: [GC 165496.118: [ParNew: 471872K-&gt;52416K(471872K), 0.1903580 secs] 1879635K-&gt;1515864K(2044736K), 0.1905860 secs] [Times: user=0.44 sys=0.03, real=0.19 secs] </span><br><span class="line">165496.715: [GC 165496.715: [ParNew: 471872K-&gt;52416K(471872K), 0.2422860 secs] 1935320K-&gt;1563468K(2044736K), 0.2425610 secs] [Times: user=0.58 sys=0.02, real=0.24 secs] </span><br><span class="line">165497.487: [Full GC 165497.487: [CMS165498.311: [CMS-concurrent-mark: 3.262/3.965 secs] [Times: user=11.02 sys=0.73, real=3.96 secs] </span><br><span class="line"> (concurrent mode failure): 1511052K-&gt;1366128K(1572864K), 5.3419340 secs] 1982924K-&gt;1366128K(2044736K), [CMS Perm : 81638K-&gt;81638K(136412K)], 5.3422540 secs] [Times: user=5.28 sys=0.00, real=5.34 secs] </span><br><span class="line">165503.637: [GC 165503.637: [ParNew: 419456K-&gt;52416K(471872K), 0.1635850 secs] 1785584K-&gt;1421481K(2044736K), 0.1638860 secs] [Times: user=0.39 sys=0.01, real=0.16 secs] </span><br><span class="line">165503.804: [GC [1 CMS-initial-mark: 1369065K(1572864K)] 1424544K(2044736K), 0.1566690 secs] [Times: user=0.15 sys=0.00, real=0.15 secs] </span><br><span class="line">165503.961: [CMS-concurrent-mark-start]</span><br><span class="line">165505.133: [GC 165505.133: [ParNew: 471866K-&gt;52416K(471872K), 0.4184870 secs] 1840931K-&gt;1480980K(2044736K), 0.4188850 secs] [Times: user=0.91 sys=0.04, real=0.42 secs] </span><br><span class="line">165506.175: [GC 165506.176: [ParNew: 471872K-&gt;52416K(471872K), 0.2192270 secs] 1900436K-&gt;1525506K(2044736K), 0.2194620 secs] [Times: user=0.49 sys=0.01, real=0.22 secs] </span><br><span class="line">165507.094: [GC 165507.094: [ParNew: 471872K-&gt;52416K(471872K), 0.2391910 secs] 1944962K-&gt;1569157K(2044736K), 0.2394130 secs] [Times: user=0.49 sys=0.02, real=0.24 secs] </span><br><span class="line">165508.178: [Full GC 165508.178: [CMS165509.030: [CMS-concurrent-mark: 4.169/5.068 secs] [Times: user=14.16 sys=1.11, real=5.07 secs] </span><br><span class="line"> (concurrent mode failure): 1516741K-&gt;1484032K(1572864K), 8.9510320 secs] 1988613K-&gt;1484032K(2044736K), [CMS Perm : 81663K-&gt;81634K(136412K)], 8.9515060 secs] [Times: user=7.56 sys=0.15, real=8.95 secs] </span><br><span class="line">165517.659: [GC 165517.659: [ParNew: 419456K-&gt;52416K(471872K), 0.1610900 secs] 1903488K-&gt;1541664K(2044736K), 0.1613260 secs] [Times: user=0.31 sys=0.00, real=0.16 secs] </span><br><span class="line">165518.036: [GC [1 CMS-initial-mark: 1489248K(1572864K)] 1717780K(2044736K), 0.5143650 secs] [Times: user=0.51 sys=0.00, real=0.51 secs] </span><br><span class="line">165518.552: [CMS-concurrent-mark-start]</span><br><span class="line">165519.175: [GC 165519.175: [ParNew: 471872K-&gt;52416K(471872K), 0.5417870 secs] 1961120K-&gt;1606922K(2044736K), 0.5421660 secs] [Times: user=1.07 sys=0.04, real=0.54 secs] </span><br><span class="line">165520.553: [Full GC 165520.553: [CMS165521.788: [CMS-concurrent-mark: 2.683/3.236 secs] [Times: user=7.05 sys=0.65, real=3.24 secs] </span><br><span class="line"> (concurrent mode failure): 1554506K-&gt;1522781K(1572864K), 6.0295590 secs] 2026378K-&gt;1522781K(2044736K), [CMS Perm : 81634K-&gt;81634K(136412K)], 6.0298480 secs] [Times: user=5.97 sys=0.01, real=6.03 secs] </span><br><span class="line">165526.774: [GC 165526.774: [ParNew: 227496K-&gt;227496K(471872K), 0.0000320 secs] 1750278K-&gt;1750278K(2044736K), 0.0001730 secs] [Times: user=0.00 sys=0.00, real=0.00 secs] </span><br><span class="line">GC locker: Trying a full collection because scavenge failed</span><br><span class="line">165526.774: [Full GC 165526.774: [CMS: 1522781K-&gt;1532156K(1572864K), 5.7417660 secs] 1750278K-&gt;1532156K(2044736K), [CMS Perm : 81634K-&gt;81634K(136412K)], 5.7420650 secs] [Times: user=5.67 sys=0.01, real=5.74 secs] </span><br><span class="line">165532.560: [GC [1 CMS-initial-mark: 1532156K(1572864K)] 1559772K(2044736K), 0.3628570 secs] [Times: user=0.33 sys=0.02, real=0.37 secs] </span><br><span class="line">165532.923: [CMS-concurrent-mark-start]</span><br><span class="line">165533.668: [GC 165533.668: [ParNew: 419456K-&gt;419456K(471872K), 0.0000250 secs]165533.668: [CMS165535.512: [CMS-concurrent-mark: 2.581/2.589 secs] [Times: user=4.38 sys=0.27, real=2.59 secs] </span><br><span class="line"> (concurrent mode failure): 1532156K-&gt;1544103K(1572864K), 7.4693280 secs] 1951612K-&gt;1544103K(2044736K), 7.4697110 secs] [Times: user=7.30 sys=0.04, real=7.47 secs] </span><br><span class="line">165542.182: [GC 165542.183: [ParNew: 419456K-&gt;419456K(471872K), 0.0000450 secs]165542.183: [CMS: 1544103K-&gt;1546768K(1572864K), 4.2923010 secs] 1963559K-&gt;1546768K(2044736K), 4.2927530 secs] [Times: user=4.25 sys=0.00, real=4.29 secs] </span><br><span class="line">165546.939: [GC [1 CMS-initial-mark: 1546768K(1572864K)] 1966224K(2044736K), 0.3814880 secs] [Times: user=0.37 sys=0.00, real=0.38 secs] </span><br><span class="line">165547.321: [CMS-concurrent-mark-start]</span><br><span class="line">165547.322: [GC 165547.323: [ParNew: 419456K-&gt;419456K(471872K), 0.0000240 secs]165547.323: [CMS165549.212: [CMS-concurrent-mark: 1.885/1.891 secs] [Times: user=1.88 sys=0.00, real=1.90 secs] </span><br><span class="line"> (concurrent mode failure): 1546768K-&gt;1558536K(1572864K), 7.2698510 secs] 1966224K-&gt;1558536K(2044736K), 7.2701150 secs] [Times: user=7.20 sys=0.00, real=7.27 secs] </span><br><span class="line">165555.162: [GC 165555.162: [ParNew: 419456K-&gt;419456K(471872K), 0.0000440 secs]165555.162: [CMS: 1558536K-&gt;1572419K(1572864K), 4.6586080 secs] 1977992K-&gt;1572419K(2044736K), 4.6590020 secs] [Times: user=4.59 sys=0.00, real=4.65 secs] </span><br><span class="line">165559.919: [GC [1 CMS-initial-mark: 1572419K(1572864K)] 1693916K(2044736K), 0.3145610 secs] [Times: user=0.31 sys=0.00, real=0.32 secs] </span><br><span class="line">165560.236: [CMS-concurrent-mark-start]</span><br><span class="line">165560.628: [GC 165560.628: [ParNew: 419456K-&gt;419456K(471872K), 0.0000280 secs]165560.628: [CMS165562.196: [CMS-concurrent-mark: 1.954/1.961 secs] [Times: user=2.84 sys=0.19, real=1.96 secs] </span><br><span class="line"> (concurrent mode failure): 1572419K-&gt;1572863K(1572864K), 8.8879030 secs] 1991875K-&gt;1607194K(2044736K), 8.8882080 secs] [Times: user=8.80 sys=0.00, real=8.89 secs] </span><br><span class="line">165569.881: [Full GC 165569.881: [CMS: 1572863K-&gt;1572863K(1572864K), 4.8703640 secs] 1992319K-&gt;1634385K(2044736K), [CMS Perm : 81634K-&gt;81634K(136412K)], 4.8706150 secs] [Times: user=4.82 sys=0.00, real=4.88 secs] </span><br><span class="line">165574.775: [GC [1 CMS-initial-mark: 1572863K(1572864K)] 1656915K(2044736K), 0.1364280 secs] [Times: user=0.14 sys=0.00, real=0.14 secs] </span><br><span class="line">165574.911: [CMS-concurrent-mark-start]</span><br><span class="line">165575.648: [Full GC 165575.649: [CMS165576.932: [CMS-concurrent-mark: 2.013/2.020 secs] [Times: user=3.41 sys=0.21, real=2.01 secs] </span><br><span class="line"> (concurrent mode failure): 1572863K-&gt;1572863K(1572864K), 5.9651530 secs] 2044735K-&gt;1682474K(2044736K), [CMS Perm : 81634K-&gt;81634K(136412K)], 5.9654160 secs] [Times: user=5.91 sys=0.00, real=5.97 secs] </span><br><span class="line">165582.423: [Full GC 165582.423: [CMS: 1572863K-&gt;1572864K(1572864K), 5.0236220 secs] 2044735K-&gt;1695427K(2044736K), [CMS Perm : 81634K-&gt;81634K(136412K)], 5.0239250 secs] [Times: user=4.98 sys=0.00, real=5.02 secs] </span><br><span class="line">165587.448: [GC [1 CMS-initial-mark: 1572864K(1572864K)] 1697093K(2044736K), 0.1697460 secs] [Times: user=0.17 sys=0.00, real=0.17 secs] </span><br><span class="line">165587.618: [CMS-concurrent-mark-start]</span><br><span class="line">165588.609: [Full GC 165588.609: [CMS165589.719: [CMS-concurrent-mark: 2.093/2.100 secs] [Times: user=4.07 sys=0.63, real=2.10 secs] </span><br><span class="line"> (concurrent mode failure): 1572864K-&gt;1572864K(1572864K), 6.7291670 secs] 2044735K-&gt;1724617K(2044736K), [CMS Perm : 81634K-&gt;81634K(136412K)], 6.7294860 secs] [Times: user=6.62 sys=0.03, real=6.73 secs] </span><br><span class="line">165596.592: [Full GC 165596.592: [CMS: 1572864K-&gt;1572864K(1572864K), 4.4670560 secs] 2044735K-&gt;1735633K(2044736K), [CMS Perm : 81634K-&gt;81634K(136412K)], 4.4673550 secs] [Times: user=4.43 sys=0.00, real=4.47 secs] </span><br><span class="line">165601.346: [GC [1 CMS-initial-mark: 1572864K(1572864K)] 1992320K(2044736K), 0.5660880 secs] [Times: user=0.56 sys=0.00, real=0.57 secs] </span><br><span class="line">165601.913: [CMS-concurrent-mark-start]</span><br><span class="line">165602.192: [Full GC 165602.192: [CMS165603.600: [CMS-concurrent-mark: 1.681/1.687 secs] [Times: user=2.27 sys=0.20, real=1.68 secs] </span><br><span class="line"> (concurrent mode failure): 1572864K-&gt;1572863K(1572864K), 7.8641150 secs] 2044734K-&gt;1739724K(2044736K), [CMS Perm : 81634K-&gt;81634K(136412K)], 7.8643680 secs] [Times: user=7.78 sys=0.00, real=7.86 secs] </span><br><span class="line">165610.597: [Full GC 165610.597: [CMS: 1572863K-&gt;1572864K(1572864K), 4.9612280 secs] 2044735K-&gt;1738303K(2044736K), [CMS Perm : 81634K-&gt;81634K(136412K)], 4.9614800 secs] [Times: user=4.92 sys=0.00, real=4.96 secs] </span><br><span class="line">165615.797: [GC [1 CMS-initial-mark: 1572864K(1572864K)] 1992913K(2044736K), 0.3312260 secs] [Times: user=0.32 sys=0.00, real=0.33 secs] </span><br><span class="line">165616.129: [CMS-concurrent-mark-start]</span><br><span class="line">165616.507: [Full GC 165616.507: [CMS165618.227: [CMS-concurrent-mark: 2.085/2.098 secs] [Times: user=2.89 sys=0.26, real=2.10 secs] </span><br><span class="line"> (concurrent mode failure): 1572864K-&gt;1572863K(1572864K), 8.0011150 secs] 2044735K-&gt;1733747K(2044736K), [CMS Perm : 81634K-&gt;81634K(136412K)], 8.0014230 secs] [Times: user=7.91 sys=0.00, real=8.00 secs] </span><br><span class="line">165624.791: [GC [1 CMS-initial-mark: 1572863K(1572864K)] 1997838K(2044736K), 0.3768850 secs] [Times: user=0.38 sys=0.00, real=0.38 secs] </span><br><span class="line">165625.168: [CMS-concurrent-mark-start]</span><br><span class="line">165625.514: [Full GC 165625.514: [CMS165627.373: [CMS-concurrent-mark: 2.191/2.204 secs] [Times: user=2.95 sys=0.23, real=2.21 secs] </span><br><span class="line"> (concurrent mode failure): 1572863K-&gt;1572863K(1572864K), 8.6134440 secs] 2044735K-&gt;1745403K(2044736K), [CMS Perm : 81634K-&gt;81634K(136412K)], 8.6138280 secs] [Times: user=8.50 sys=0.02, real=8.61 secs] </span><br><span class="line">165634.940: [Full GC 165634.940: [CMS: 1572863K-&gt;1572863K(1572864K), 5.7606810 secs] 2044735K-&gt;1763133K(2044736K), [CMS Perm : 81634K-&gt;81634K(136412K)], 5.7610340 secs] [Times: user=5.70 sys=0.00, real=5.76 secs] </span><br><span class="line">165640.853: [GC [1 CMS-initial-mark: 1572863K(1572864K)] 1992760K(2044736K), 0.5402960 secs] [Times: user=0.54 sys=0.00, real=0.54 secs] </span><br><span class="line">165641.394: [CMS-concurrent-mark-start]</span><br><span class="line">165641.711: [Full GC 165641.711: [CMS165643.146: [CMS-concurrent-mark: 1.745/1.752 secs] [Times: user=2.40 sys=0.24, real=1.75 secs] </span><br><span class="line"> (concurrent mode failure): 1572863K-&gt;1572863K(1572864K), 7.6559090 secs] 2044735K-&gt;1806228K(2044736K), [CMS Perm : 81634K-&gt;81634K(136412K)], 7.6561430 secs] [Times: user=7.58 sys=0.00, real=7.66 secs] </span><br><span class="line">165649.836: [Full GC 165649.836: [CMS: 1572863K-&gt;1572863K(1572864K), 6.5024530 secs] 2044735K-&gt;1808957K(2044736K), [CMS Perm : 81634K-&gt;81634K(136412K)], 6.5028710 secs] [Times: user=6.42 sys=0.00, real=6.50 secs] </span><br><span class="line">165656.702: [GC [1 CMS-initial-mark: 1572863K(1572864K)] 1992334K(2044736K), 0.6510610 secs] [Times: user=0.65 sys=0.00, real=0.65 secs] </span><br><span class="line">165657.354: [CMS-concurrent-mark-start]</span><br><span class="line">165657.768: [Full GC 165657.768: [CMS165659.289: [CMS-concurrent-mark: 1.926/1.935 secs] [Times: user=2.79 sys=0.33, real=1.93 secs] </span><br><span class="line"> (concurrent mode failure): 1572864K-&gt;1572863K(1572864K), 9.4778960 secs] 2044735K-&gt;1817502K(2044736K), [CMS Perm : 81634K-&gt;81634K(136412K)], 9.4782160 secs] [Times: user=9.15 sys=0.00, real=9.48 secs] </span><br><span class="line">165668.339: [Full GC 165668.339: [CMS[Unloading class sun.reflect.GeneratedSerializationConstructorAccessor82]</span><br><span class="line">: 1572864K-&gt;1572863K(1572864K), 9.3393990 secs] 2044736K-&gt;1848935K(2044736K), [CMS Perm : 81634K-&gt;81631K(136412K)], 9.3398270 secs] [Times: user=9.25 sys=0.00, real=9.34 secs] </span><br><span class="line">165677.949: [GC [1 CMS-initial-mark: 1572863K(1572864K)] 1993871K(2044736K), 0.6954050 secs] [Times: user=0.69 sys=0.00, real=0.70 secs] </span><br><span class="line">165678.644: [CMS-concurrent-mark-start]</span><br><span class="line">165679.539: [Full GC 165679.540: [CMS165681.669: [CMS-concurrent-mark: 3.012/3.025 secs] [Times: user=4.80 sys=0.64, real=3.02 secs] </span><br><span class="line"> (concurrent mode failure): 1572863K-&gt;1572863K(1572864K), 11.9368790 secs] 2044735K-&gt;1859006K(2044736K), [CMS Perm : 81631K-&gt;81631K(136412K)], 11.9372800 secs] [Times: user=11.61 sys=0.00, real=11.94 secs] </span><br><span class="line">165692.759: [Full GC 165692.759: [CMS[Unloading class sun.reflect.GeneratedConstructorAccessor240]</span><br><span class="line">: 1572863K-&gt;1572863K(1572864K), 11.2508310 secs] 2044735K-&gt;1874250K(2044736K), [CMS Perm : 81631K-&gt;81628K(136412K)], 11.2511750 secs] [Times: user=9.91 sys=0.00, real=11.25 secs] </span><br><span class="line">165704.100: [GC [1 CMS-initial-mark: 1572863K(1572864K)] 1992415K(2044736K), 0.3157090 secs] [Times: user=0.31 sys=0.00, real=0.32 secs] </span><br><span class="line">165704.416: [CMS-concurrent-mark-start]</span><br><span class="line">165704.825: [Full GC 165704.825: [CMS165706.129: [CMS-concurrent-mark: 1.703/1.713 secs] [Times: user=2.54 sys=0.34, real=1.71 secs] </span><br><span class="line"> (concurrent mode failure): 1572863K-&gt;1572863K(1572864K), 6.3984280 secs] 2044732K-&gt;1866289K(2044736K), [CMS Perm : 81628K-&gt;81628K(136412K)], 6.3986960 secs] [Times: user=6.34 sys=0.01, real=6.40 secs] </span><br><span class="line">165711.728: [Full GC 165711.728: [CMS: 1572863K-&gt;1572863K(1572864K), 5.4379380 secs] 2044735K-&gt;1880349K(2044736K), [CMS Perm : 81628K-&gt;81628K(136412K)], 5.4382730 secs] [Times: user=5.39 sys=0.00, real=5.44 secs] </span><br><span class="line">165717.351: [GC [1 CMS-initial-mark: 1572863K(1572864K)] 1992539K(2044736K), 0.6038490 secs] [Times: user=0.60 sys=0.00, real=0.61 secs] </span><br><span class="line">165717.955: [CMS-concurrent-mark-start]</span><br><span class="line">165718.302: [Full GC 165718.302: [CMS165719.904: [CMS-concurrent-mark: 1.943/1.949 secs] [Times: user=2.69 sys=0.24, real=1.95 secs] </span><br><span class="line"> (concurrent mode failure)[Unloading class sun.reflect.GeneratedSerializationConstructorAccessor25]</span><br><span class="line">[Unloading class sun.reflect.GeneratedSerializationConstructorAccessor18]</span><br><span class="line">[Unloading class sun.reflect.GeneratedSerializationConstructorAccessor17]</span><br><span class="line">[Unloading class sun.reflect.GeneratedSerializationConstructorAccessor22]</span><br><span class="line">[Unloading class sun.reflect.GeneratedMethodAccessor1445]</span><br><span class="line">[Unloading class sun.reflect.GeneratedSerializationConstructorAccessor24]</span><br><span class="line">[Unloading class sun.reflect.GeneratedSerializationConstructorAccessor10]</span><br><span class="line">[Unloading class sun.reflect.GeneratedMethodAccessor441]</span><br><span class="line">[Unloading class sun.reflect.GeneratedMethodAccessor854]</span><br><span class="line">: 1572863K-&gt;1572863K(1572864K), 7.1694470 secs] 2044735K-&gt;1862162K(2044736K), [CMS Perm : 81628K-&gt;81598K(136412K)], 7.1696770 secs] [Times: user=7.09 sys=0.00, real=7.17 secs] </span><br><span class="line">165726.106: [Full GC 165726.106: [CMS: 1572863K-&gt;1572862K(1572864K), 4.8448050 secs] 2044735K-&gt;1877599K(2044736K), [CMS Perm : 81598K-&gt;81598K(136412K)], 4.8451090 secs] [Times: user=4.80 sys=0.00, real=4.84 secs] </span><br><span class="line">165731.084: [GC [1 CMS-initial-mark: 1572862K(1572864K)] 1992928K(2044736K), 0.3369610 secs] [Times: user=0.34 sys=0.00, real=0.33 secs] </span><br><span class="line">165731.421: [CMS-concurrent-mark-start]</span><br><span class="line">165731.716: [Full GC 165731.716: [CMS165733.347: [CMS-concurrent-mark: 1.919/1.925 secs] [Times: user=2.56 sys=0.20, real=1.92 secs] </span><br><span class="line"> (concurrent mode failure): 1572862K-&gt;1572252K(1572864K), 10.0779900 secs] 2044734K-&gt;1873718K(2044736K), [CMS Perm : 81598K-&gt;81598K(136412K)], 10.0782250 secs] [Times: user=9.64 sys=0.00, real=10.08 secs] </span><br><span class="line">165742.925: [Full GC 165742.925: [CMS: 1572776K-&gt;1572408K(1572864K), 6.1126860 secs] 2044648K-&gt;1887999K(2044736K), [CMS Perm : 81598K-&gt;81598K(136412K)], 6.1130120 secs] [Times: user=6.05 sys=0.00, real=6.11 secs] </span><br><span class="line">165749.202: [GC [1 CMS-initial-mark: 1572408K(1572864K)] 1991990K(2044736K), 0.7009320 secs] [Times: user=0.69 sys=0.00, real=0.71 secs] </span><br><span class="line">165749.903: [CMS-concurrent-mark-start]</span><br><span class="line">165750.271: [Full GC 165750.271: [CMS165751.834: [CMS-concurrent-mark: 1.920/1.931 secs] [Times: user=2.65 sys=0.30, real=1.93 secs] </span><br><span class="line"> (concurrent mode failure): 1572647K-&gt;1572863K(1572864K), 8.3700350 secs] 2044519K-&gt;1900106K(2044736K), [CMS Perm : 81598K-&gt;81598K(136412K)], 8.3703090 secs] [Times: user=8.25 sys=0.00, real=8.38 secs] </span><br><span class="line">165759.574: [Full GC 165759.574: [CMS[Unloading class sun.reflect.GeneratedSerializationConstructorAccessor19]</span><br><span class="line">: 1572863K-&gt;1572863K(1572864K), 5.2368120 secs] 2044735K-&gt;1906019K(2044736K), [CMS Perm : 81598K-&gt;81594K(136412K)], 5.2371710 secs] [Times: user=5.17 sys=0.01, real=5.24 secs] </span><br><span class="line">165764.957: [GC [1 CMS-initial-mark: 1572863K(1572864K)] 1992752K(2044736K), 0.5464550 secs] [Times: user=0.54 sys=0.00, real=0.55 secs] </span><br><span class="line">165765.504: [CMS-concurrent-mark-start]</span><br><span class="line">165765.849: [Full GC 165765.849: [CMS165767.557: [CMS-concurrent-mark: 2.043/2.053 secs] [Times: user=2.59 sys=0.28, real=2.05 secs] </span><br><span class="line"> (concurrent mode failure)</span><br></pre></td></tr></table></figure>
+<h3><span id="分析原因">分析原因</span></h3><p>根据<a href="https://calfgz.github.io/blog/2017/08/java-jvm.html">JVM调优—GC 长时间停顿问题及解决方法</a>分析，出现这种情况基本可以定位两种原因：</p>
+<ul>
+<li><p>在 CMS 启动过程中，新生代提升速度过快，老年代收集速度赶不上新生代提升速度</p>
+</li>
+<li><p>在 CMS 启动过程中，老年代碎片化严重，无法容纳新生代提升上来的大对象</p>
+</li>
+</ul>
+<p>发生这种情况，应用线程将会全部停止（相当于网站这段时间无法响应用户请求），进行压缩式垃圾收集（回退到 Serial Old 算法）。</p>
+<p>根据建议先进行JVM参数调整，然后再分析内存存放的数据状况。</p>
+<h3><span id="jvm参数调整">JVM参数调整</span></h3><p>增加三个参数:<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">jvm-arg</span>&gt;</span>-XX:+UseCMSInitiatingOccupancyOnly<span class="tag">&lt;/<span class="name">jvm-arg</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">jvm-arg</span>&gt;</span>-XX:CMSInitiatingOccupancyFraction=60<span class="tag">&lt;/<span class="name">jvm-arg</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">jvm-arg</span>&gt;</span>-XX:CMSFullGCsBeforeCompaction=1<span class="tag">&lt;/<span class="name">jvm-arg</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p>调整前：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">jvm-arg</span>&gt;</span>-Xms2048m<span class="tag">&lt;/<span class="name">jvm-arg</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">jvm-arg</span>&gt;</span>-Xmx2048m<span class="tag">&lt;/<span class="name">jvm-arg</span>&gt;</span>                  </span><br><span class="line"><span class="tag">&lt;<span class="name">jvm-arg</span>&gt;</span>-Xmn512m<span class="tag">&lt;/<span class="name">jvm-arg</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">jvm-arg</span>&gt;</span>-Xss256k<span class="tag">&lt;/<span class="name">jvm-arg</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">jvm-arg</span>&gt;</span>-XX:+UseConcMarkSweepGC<span class="tag">&lt;/<span class="name">jvm-arg</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">jvm-arg</span>&gt;</span>-XX:+UseParNewGC<span class="tag">&lt;/<span class="name">jvm-arg</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">jvm-arg</span>&gt;</span>-XX:+CMSParallelRemarkEnabled<span class="tag">&lt;/<span class="name">jvm-arg</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">jvm-arg</span>&gt;</span>-XX:+UseCMSCompactAtFullCollection<span class="tag">&lt;/<span class="name">jvm-arg</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">jvm-arg</span>&gt;</span>-XX:PermSize=128m<span class="tag">&lt;/<span class="name">jvm-arg</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">jvm-arg</span>&gt;</span>-XX:MaxPermSize=256m<span class="tag">&lt;/<span class="name">jvm-arg</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">jvm-arg</span>&gt;</span>-XX:+PrintGCTimeStamps<span class="tag">&lt;/<span class="name">jvm-arg</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">jvm-arg</span>&gt;</span>-XX:+PrintGCDetails<span class="tag">&lt;/<span class="name">jvm-arg</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p>调整后：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">jvm-arg</span>&gt;</span>-Xms2048m<span class="tag">&lt;/<span class="name">jvm-arg</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">jvm-arg</span>&gt;</span>-Xmx2048m<span class="tag">&lt;/<span class="name">jvm-arg</span>&gt;</span>                  </span><br><span class="line"><span class="tag">&lt;<span class="name">jvm-arg</span>&gt;</span>-Xmn512m<span class="tag">&lt;/<span class="name">jvm-arg</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">jvm-arg</span>&gt;</span>-Xss256k<span class="tag">&lt;/<span class="name">jvm-arg</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">jvm-arg</span>&gt;</span>-XX:+UseConcMarkSweepGC<span class="tag">&lt;/<span class="name">jvm-arg</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">jvm-arg</span>&gt;</span>-XX:+UseParNewGC<span class="tag">&lt;/<span class="name">jvm-arg</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">jvm-arg</span>&gt;</span>-XX:+CMSParallelRemarkEnabled<span class="tag">&lt;/<span class="name">jvm-arg</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">jvm-arg</span>&gt;</span>-XX:+UseCMSCompactAtFullCollection<span class="tag">&lt;/<span class="name">jvm-arg</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">jvm-arg</span>&gt;</span>-XX:+UseCMSInitiatingOccupancyOnly<span class="tag">&lt;/<span class="name">jvm-arg</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">jvm-arg</span>&gt;</span>-XX:CMSInitiatingOccupancyFraction=60<span class="tag">&lt;/<span class="name">jvm-arg</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">jvm-arg</span>&gt;</span>-XX:CMSFullGCsBeforeCompaction=1<span class="tag">&lt;/<span class="name">jvm-arg</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">jvm-arg</span>&gt;</span>-XX:PermSize=128m<span class="tag">&lt;/<span class="name">jvm-arg</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">jvm-arg</span>&gt;</span>-XX:MaxPermSize=256m<span class="tag">&lt;/<span class="name">jvm-arg</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">jvm-arg</span>&gt;</span>-XX:+PrintGCTimeStamps<span class="tag">&lt;/<span class="name">jvm-arg</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">jvm-arg</span>&gt;</span>-XX:+PrintGCDetails<span class="tag">&lt;/<span class="name">jvm-arg</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<h3><span id="jvm参数调整后观察">JVM参数调整后观察</span></h3><p>调整后观察服务器比调整前稳定多了，重启情况减少，但偶尔还是会并发模式失败(<code>concurrent mode failure</code>)的错误并重启。</p>
+<h3><span id="分析jvm内存对象">分析JVM内存对象</span></h3><p>直接上图：<br><img src="/images/jvm-optimize/002.jpg" alt="JVM内存对象列表"></p>
+<p><img src="/images/jvm-optimize/003.jpg" alt="JVM内存对象列表2"></p>
+<p>从上图可以很容易发现红框内的对象占比非常大，分析代码发现此处产品筛选页面中的索引文件生成和调用设计有问题，每个分类都会生成单独的一份索引文件，几千个分类就得生成几千个分类，当爬虫过来频繁爬取未有页面缓存内容时，此处频繁加载索引文件到内存中，瞬间把JVM内存中Old代占满而无法释放。</p>
+<h2><span id="优化解决">优化解决</span></h2><p>重新调整索引方案，分析整理各分类下不同属性之间的关系，将所有分类的索引文件整合成一个。</p>
+<h2><span id="优化后效果">优化后效果</span></h2><p>优化后观察系统稳定，JVM日志也没发现再有并发模式失败(<code>concurrent mode failure</code>)的错误。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Java/" rel="tag"># Java</a>
+          
+            <a href="/tags/JVM/" rel="tag"># JVM</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/blog/2017/08/jvm-cms.html" rel="next" title="JVM GC算法 CMS 详解">
+                <i class="fa fa-chevron-left"></i> JVM GC算法 CMS 详解
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/blog/2017/08/architecture-summary.html" rel="prev" title="大型分布式网站架构技术总结[转]">
+                大型分布式网站架构技术总结[转] <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image" src="/images/avatar.gif" alt="calfgz">
+          <p class="site-author-name" itemprop="name">calfgz</p>
+           
+              <p class="site-description motion-element" itemprop="description">Draw my work with code</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">29</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">9</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">31</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/calfgz" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#undefined"><span class="nav-number">1.</span> <span class="nav-text">背景</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#undefined"><span class="nav-number">2.</span> <span class="nav-text">线上情况</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#undefined"><span class="nav-number">3.</span> <span class="nav-text">排查</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#undefined"><span class="nav-number">3.1.</span> <span class="nav-text">DUMP日志分析</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#undefined"><span class="nav-number">3.2.</span> <span class="nav-text">GC分析</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#undefined"><span class="nav-number">3.3.</span> <span class="nav-text">分析原因</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#undefined"><span class="nav-number">3.4.</span> <span class="nav-text">JVM参数调整</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#undefined"><span class="nav-number">3.5.</span> <span class="nav-text">JVM参数调整后观察</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#undefined"><span class="nav-number">3.6.</span> <span class="nav-text">分析JVM内存对象</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#undefined"><span class="nav-number">4.</span> <span class="nav-text">优化解决</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#undefined"><span class="nav-number">5.</span> <span class="nav-text">优化后效果</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy;  2017 - 
+  <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">calfgz</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

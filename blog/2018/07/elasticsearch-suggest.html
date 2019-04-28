@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css">
+
+
+  <meta name="keywords" content="ElasticSearch,">
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="牛犊记" type="application/atom+xml">
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1">
+
+
+
+
+
+
+<meta name="description" content="Elasticsearch 索引的设计单一索引VS基于时间的索引单一索引的问题： 不能更新Mapping。  比如：主分片数不可以修改（除非reindex）。 无法灵活、快速地扩展。 更适合固定、小型数据集。  基于时间的索引面临的问题： 如何确定间隔？ 数据量 变更频率 默认尝试每周为单位分割——建议   如何实施？ 索引模板    定义索引注意事项举例：12345678910111213141">
+<meta name="keywords" content="ElasticSearch">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ElasticSearch实战应用建议">
+<meta property="og:url" content="http://calfgz.github.io/blog/2018/07/elasticsearch-suggest.html">
+<meta property="og:site_name" content="牛犊记">
+<meta property="og:description" content="Elasticsearch 索引的设计单一索引VS基于时间的索引单一索引的问题： 不能更新Mapping。  比如：主分片数不可以修改（除非reindex）。 无法灵活、快速地扩展。 更适合固定、小型数据集。  基于时间的索引面临的问题： 如何确定间隔？ 数据量 变更频率 默认尝试每周为单位分割——建议   如何实施？ 索引模板    定义索引注意事项举例：12345678910111213141">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2019-04-28T07:38:07.344Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="ElasticSearch实战应用建议">
+<meta name="twitter:description" content="Elasticsearch 索引的设计单一索引VS基于时间的索引单一索引的问题： 不能更新Mapping。  比如：主分片数不可以修改（除非reindex）。 无法灵活、快速地扩展。 更适合固定、小型数据集。  基于时间的索引面临的问题： 如何确定间隔？ 数据量 变更频率 默认尝试每周为单位分割——建议   如何实施？ 索引模板    定义索引注意事项举例：12345678910111213141">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://calfgz.github.io/blog/2018/07/elasticsearch-suggest.html">
+
+
+
+
+
+  <title>ElasticSearch实战应用建议 | 牛犊记</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?eb8a0170f0ad9db33295cfbe2dc5b699";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">牛犊记</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://calfgz.github.io/blog/2018/07/elasticsearch-suggest.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="calfgz">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="牛犊记">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">ElasticSearch实战应用建议</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-07-10T10:15:15+08:00">
+                2018-07-10
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/ElasticSearch/" itemprop="url" rel="index">
+                    <span itemprop="name">ElasticSearch</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h3><span id="elasticsearch-索引的设计">Elasticsearch 索引的设计</span></h3><h4><span id="单一索引vs基于时间的索引">单一索引VS基于时间的索引</span></h4><h5><span id="单一索引的问题">单一索引的问题：</span></h5><ul>
+<li>不能更新Mapping。<br>  比如：主分片数不可以修改（除非reindex）。</li>
+<li>无法灵活、快速地扩展。</li>
+<li>更适合固定、小型数据集。</li>
+</ul>
+<h5><span id="基于时间的索引面临的问题">基于时间的索引面临的问题：</span></h5><ul>
+<li>如何确定间隔？<ul>
+<li>数据量</li>
+<li>变更频率</li>
+<li>默认尝试每周为单位分割——建议</li>
+</ul>
+</li>
+<li>如何实施？<ul>
+<li>索引模板</li>
+</ul>
+</li>
+</ul>
+<h4><span id="定义索引注意事项">定义索引注意事项</span></h4><p>举例：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    &quot;facet_internet_access_minute&quot;:&#123;</span><br><span class="line">        &quot;template&quot;:&quot;ce-index-access-v1-*&quot;,</span><br><span class="line">        &quot;order&quot;:0,</span><br><span class="line">        &quot;settings&quot;:&#123;</span><br><span class="line">            &quot;number_of_shards&quot;:5</span><br><span class="line">        &#125;,</span><br><span class="line">        &quot;aliases&quot;:&#123;</span><br><span class="line">            &quot;&#123;index&#125;-query&quot;:&#123;</span><br><span class="line"></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;,</span><br><span class="line">        &quot;mappings&quot;:&#123;</span><br><span class="line">            &quot;es_doc&quot;:&#123;</span><br><span class="line">                &quot;dynamic&quot;:&quot;strict&quot;,</span><br><span class="line">                &quot;_all&quot;:&#123;</span><br><span class="line">                    &quot;enabled&quot;:false</span><br><span class="line">                &#125;,</span><br><span class="line">                &quot;_source&quot;:&#123;</span><br><span class="line">                    &quot;enabled&quot;:false</span><br><span class="line">                &#125;,</span><br><span class="line">                &quot;properties&quot;:&#123;</span><br><span class="line">                    &quot;CLF_Timestamp&quot;:&#123;</span><br><span class="line">                        &quot;type&quot;:&quot;long&quot;</span><br><span class="line">                    &#125;,</span><br><span class="line">                    &quot;CLF_CustomerID&quot;:&#123;</span><br><span class="line">                        &quot;type&quot;:&quot;keyword&quot;</span><br><span class="line">                    &#125;,</span><br><span class="line">                    &quot;CLF_ClientIP&quot;:&#123;</span><br><span class="line">                        &quot;type&quot;:&quot;ip&quot;,</span><br><span class="line">                        &quot;ignore_malformed&quot;:true</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h5><span id="不要在一个索引中定义多个type">不要在一个索引中定义多个type。</span></h5><p>6.X版本已经不支持，7.X版本彻底不支持。<br>扩展问题：5.X版本的父子文档实际实现中是一个索引中定义了多个type，到了6.X中实现方式改变为：join方式。</p>
+<h5><span id="将set-_source设置为false">将Set _source设置为false。</span></h5><p>假设你只关心度量结果，不是原始文件内容。<br>将节省磁盘空间并减少IO。<br>这个点，需要结合实际的业务场景具体问题具体分析。<br>举例：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&quot;_source&quot;:&#123;</span><br><span class="line">&quot;enabled&quot;:false</span><br><span class="line">&#125;,</span><br></pre></td></tr></table></figure></p>
+<h5><span id="将_all设置为false">将_all设置为false。</span></h5><p>假设你确切地知道你对哪个field做查询操作？<br>能实现性能提升，缩减存储。<br>举例：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&quot;_all&quot;:&#123;</span><br><span class="line">&quot;enabled&quot;:false &#125;,</span><br></pre></td></tr></table></figure></p>
+<h5><span id="设置dynamic-strict">设置dynamic = strict。</span></h5><p>假设你的数据是结构化数据。<br>字段设置严格，避免脏数据注入。<br>举例：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&quot;dynamic&quot;:&quot;strict&quot;,</span><br></pre></td></tr></table></figure></p>
+<h5><span id="使用keyword类型">使用keyword类型</span></h5><p>假设你只关心完全匹配<br>提高性能和缩小磁盘存储空间<br>举例：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&quot;CLF_CustomerID&quot;:&#123;</span><br><span class="line">&quot;type&quot;:&quot;keyword&quot;</span><br><span class="line">&#125;,</span><br></pre></td></tr></table></figure></p>
+<h5><span id="使用别名">使用别名</span></h5><p>如何在不停机的前提从一个索引切换到另一个索引？<br>举例：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&quot;aliases&quot;:&#123;</span><br><span class="line">&quot;&#123;index&#125;-query&quot;:&#123;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>或者你通过head插件创建。</p>
+<h3><span id="elasticsearch分片分配原则">Elasticsearch分片分配原则</span></h3><p>社区和QQ群中经常被问到的问题：</p>
+<ul>
+<li>应该分几个索引、几个分片？</li>
+<li>每个分片大小如何设置？</li>
+<li>副本多少如何设置？</li>
+</ul>
+<p>这里，明确给出实操可行的6个步骤。</p>
+<h4><span id="定义索引">定义索引。</span></h4><p>思考索引中要大致有哪些字段？<br>最好能列一个Excel表统计一下，包含但不限于：<br>序号、名称、类型、作用、备注。<br>以上对计算单条数据大小也有用。</p>
+<h4><span id="评估数据量">评估数据量。</span></h4><p>评估方法举例：<br>1分钟有100条数据，1天=1006024=144000条。<br>1月=144000条30天=432W条数据。 1年=432W12=5184W条数据。<br>假设要保存2年，共=10368W条数据。<br>假设每条数据20KB，共需要存储：10368W*20/1024/1024/1024=1.977TB。</p>
+<h4><span id="评估索引大小和磁盘空间">评估索引大小和磁盘空间。</span></h4><h4><span id="计算分片数">计算分片数。</span></h4><p>细节考虑点：</p>
+<ul>
+<li>每个分片大小应小于30GB。</li>
+<li>分片数量= k *数据节点数目（k = 一个足够小的整数，举例：1,2,3）</li>
+<li>假设你有一个小的索引，并且你有集群中有足够的节点，请尝试使用默认值分片数5。</li>
+</ul>
+<h4><span id="评估索引数和类型">评估索引数和类型。</span></h4><p>（此处可能会有多次反馈迭代）</p>
+<h3><span id="数据去重的思考">数据去重的思考？</span></h3><h4><span id="指定唯一id">指定唯一id</span></h4><p>缺点：</p>
+<ul>
+<li>唯一值无法压缩，不利于存储。</li>
+<li>存在高基数问题。</li>
+</ul>
+<h4><span id="用聚合方法实现">用聚合方法实现</span></h4><p>步骤1：所有文档加一个Hash值；<br>步骤2：检查重复；<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">GET *_index/_search &#123;</span><br><span class="line">   &quot;size&quot;:0,</span><br><span class="line">    &quot;aggs&quot;:&#123;</span><br><span class="line">       &quot;duplicate&quot;:&#123;</span><br><span class="line">           &quot;terms&quot;:&#123;</span><br><span class="line">                &quot;field&quot;:&quot;hash&quot;,</span><br><span class="line">                &quot;min_doc_count&quot;:2,</span><br><span class="line">                &quot;size&quot;:5000</span><br><span class="line">           &#125;,</span><br><span class="line">            &quot;aggs&quot;:&#123;</span><br><span class="line">                &quot;documents&quot;:&#123;</span><br><span class="line">                    &quot;top_hits&quot;:&#123;</span><br><span class="line">                        &quot;size&quot;:2</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; &#125;</span><br></pre></td></tr></table></figure></p>
+<p>步骤3：批量删除步骤2中的重复id。<br>以上步骤，不影响写入，可以实现异步。</p>
+<p>缺点：</p>
+<ul>
+<li>存储量大（尤其超过3亿条+）；</li>
+<li>随着数据量增加，聚合受影响，越来越慢。</li>
+<li>存在高基数问题。</li>
+</ul>
+<h4><span id="用distinct-query实现">用distinct query实现</span></h4><p>深入方法待进一步探讨。</p>
+<h3><span id="小结">小结</span></h3><p>以上内容是Elasticsearch南京分享会20180630上的分享核心笔记。<br>具体PPT地址：<a href="https://elasticsearch.cn/slides/115" target="_blank" rel="noopener">https://elasticsearch.cn/slides/115</a><br>很受用的分析步骤和实战经验，实战中都可以用得上。</p>
+<p>转载: <a href="https://mp.weixin.qq.com/s/YocdEQ3cVcPoXRc4tUOxOA" target="_blank" rel="noopener">铭毅天下</a></p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/ElasticSearch/" rel="tag"># ElasticSearch</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/blog/2018/07/elasticsearch-e-commerce.html" rel="next" title="使用Elasticsearch构建电商搜索平台实践案例[转]">
+                <i class="fa fa-chevron-left"></i> 使用Elasticsearch构建电商搜索平台实践案例[转]
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/blog/2018/08/log4j2-configration.html" rel="prev" title="log4j2的配置说明">
+                log4j2的配置说明 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image" src="/images/avatar.gif" alt="calfgz">
+          <p class="site-author-name" itemprop="name">calfgz</p>
+           
+              <p class="site-description motion-element" itemprop="description">Draw my work with code</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">29</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">9</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">31</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/calfgz" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#undefined"><span class="nav-number">1.</span> <span class="nav-text">Elasticsearch 索引的设计</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">1.1.</span> <span class="nav-text">单一索引VS基于时间的索引</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#undefined"><span class="nav-number">1.1.1.</span> <span class="nav-text">单一索引的问题：</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#undefined"><span class="nav-number">1.1.2.</span> <span class="nav-text">基于时间的索引面临的问题：</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">1.2.</span> <span class="nav-text">定义索引注意事项</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#undefined"><span class="nav-number">1.2.1.</span> <span class="nav-text">不要在一个索引中定义多个type。</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#undefined"><span class="nav-number">1.2.2.</span> <span class="nav-text">将Set _source设置为false。</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#undefined"><span class="nav-number">1.2.3.</span> <span class="nav-text">将_all设置为false。</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#undefined"><span class="nav-number">1.2.4.</span> <span class="nav-text">设置dynamic = strict。</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#undefined"><span class="nav-number">1.2.5.</span> <span class="nav-text">使用keyword类型</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#undefined"><span class="nav-number">1.2.6.</span> <span class="nav-text">使用别名</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#undefined"><span class="nav-number">2.</span> <span class="nav-text">Elasticsearch分片分配原则</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">2.1.</span> <span class="nav-text">定义索引。</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">2.2.</span> <span class="nav-text">评估数据量。</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">2.3.</span> <span class="nav-text">评估索引大小和磁盘空间。</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">2.4.</span> <span class="nav-text">计算分片数。</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">2.5.</span> <span class="nav-text">评估索引数和类型。</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#undefined"><span class="nav-number">3.</span> <span class="nav-text">数据去重的思考？</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">3.1.</span> <span class="nav-text">指定唯一id</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">3.2.</span> <span class="nav-text">用聚合方法实现</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">3.3.</span> <span class="nav-text">用distinct query实现</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#undefined"><span class="nav-number">4.</span> <span class="nav-text">小结</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy;  2017 - 
+  <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">calfgz</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

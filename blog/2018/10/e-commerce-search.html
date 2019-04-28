@@ -1,0 +1,875 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css">
+
+
+  <meta name="keywords" content="ElasticSearch,分布式架构,">
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="牛犊记" type="application/atom+xml">
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1">
+
+
+
+
+
+
+<meta name="description" content="什么搜索引擎搜索引擎(search engine)是指根据一定的策略、运用特定的计算机程序搜集互联网上的信息，在对信息进行组织和处理后，为用户提供检索服务的系统。数据其实就是一块块的砖头，当用户需要的时候搜索引擎搬过来。我们的宗旨就是在最短的时间内，让用户找到他们最想要的东西。  电商搜索业务特点 第一点， 电商系统的商品数量『庞大』，搜索页的PV高。某宝2013年有7亿线上商品， List的PV">
+<meta name="keywords" content="ElasticSearch,分布式架构">
+<meta property="og:type" content="article">
+<meta property="og:title" content="电商系统之搜索引擎[转]">
+<meta property="og:url" content="http://calfgz.github.io/blog/2018/10/e-commerce-search.html">
+<meta property="og:site_name" content="牛犊记">
+<meta property="og:description" content="什么搜索引擎搜索引擎(search engine)是指根据一定的策略、运用特定的计算机程序搜集互联网上的信息，在对信息进行组织和处理后，为用户提供检索服务的系统。数据其实就是一块块的砖头，当用户需要的时候搜索引擎搬过来。我们的宗旨就是在最短的时间内，让用户找到他们最想要的东西。  电商搜索业务特点 第一点， 电商系统的商品数量『庞大』，搜索页的PV高。某宝2013年有7亿线上商品， List的PV">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://ws1.sinaimg.cn/large/006ZfUPvgy1fwrhyx2ympj30hs0apt8l.jpg">
+<meta property="og:image" content="https://ws1.sinaimg.cn/large/006ZfUPvgy1fwriewskf2j30hs0bwmx8.jpg">
+<meta property="og:image" content="https://ws1.sinaimg.cn/large/006ZfUPvgy1fwrijca5fkj30hs0b6mx5.jpg">
+<meta property="og:image" content="https://ws1.sinaimg.cn/large/006ZfUPvgy1fwrik1f8wlj30hs13vgm4.jpg">
+<meta property="og:image" content="https://ws1.sinaimg.cn/large/006ZfUPvgy1fwriv1x6epj30hs066q2x.jpg">
+<meta property="og:image" content="https://ws1.sinaimg.cn/large/006ZfUPvgy1fwrixh33s9j30hs02mdfp.jpg">
+<meta property="og:image" content="https://ws1.sinaimg.cn/large/006ZfUPvgy1fwriympsgoj30hs06xwed.jpg">
+<meta property="og:image" content="https://ws1.sinaimg.cn/large/006ZfUPvgy1fwrj0tz59hj30hs0hvjrf.jpg">
+<meta property="og:image" content="https://ws1.sinaimg.cn/large/006ZfUPvgy1fwrj3gd61tj30hs01rt8i.jpg">
+<meta property="og:image" content="https://ws1.sinaimg.cn/large/006ZfUPvgy1fwrj7jmx7tj30hs02c3yc.jpg">
+<meta property="og:image" content="https://ws1.sinaimg.cn/large/006ZfUPvgy1fwrj8i8rs7j30hs0ejaaa.jpg">
+<meta property="og:updated_time" content="2019-04-28T07:38:07.345Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="电商系统之搜索引擎[转]">
+<meta name="twitter:description" content="什么搜索引擎搜索引擎(search engine)是指根据一定的策略、运用特定的计算机程序搜集互联网上的信息，在对信息进行组织和处理后，为用户提供检索服务的系统。数据其实就是一块块的砖头，当用户需要的时候搜索引擎搬过来。我们的宗旨就是在最短的时间内，让用户找到他们最想要的东西。  电商搜索业务特点 第一点， 电商系统的商品数量『庞大』，搜索页的PV高。某宝2013年有7亿线上商品， List的PV">
+<meta name="twitter:image" content="https://ws1.sinaimg.cn/large/006ZfUPvgy1fwrhyx2ympj30hs0apt8l.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://calfgz.github.io/blog/2018/10/e-commerce-search.html">
+
+
+
+
+
+  <title>电商系统之搜索引擎[转] | 牛犊记</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?eb8a0170f0ad9db33295cfbe2dc5b699";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">牛犊记</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://calfgz.github.io/blog/2018/10/e-commerce-search.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="calfgz">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="牛犊记">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">电商系统之搜索引擎[转]</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-10-31T16:48:41+08:00">
+                2018-10-31
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/大型分布式网站架构/" itemprop="url" rel="index">
+                    <span itemprop="name">大型分布式网站架构</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2><span id="什么搜索引擎">什么搜索引擎</span></h2><p>搜索引擎(search engine)是指根据一定的策略、运用特定的计算机程序搜集互联网上的信息，在对信息进行组织和处理后，为用户提供检索服务的系统。数据其实就是一块块的砖头，当用户需要的时候搜索引擎搬过来。我们的宗旨就是在最短的时间内，让用户找到他们最想要的东西。</p>
+<p><img src="https://ws1.sinaimg.cn/large/006ZfUPvgy1fwrhyx2ympj30hs0apt8l.jpg" alt="搜索引擎"></p>
+<h3><span id="电商搜索业务特点">电商搜索业务特点</span></h3><ul>
+<li>第一点， 电商系统的商品数量『庞大』，搜索页的PV高。某宝2013年有7亿线上商品， List的PV7亿+相当于每秒有 8000个请求</li>
+<li>第二点， 电商的搜索引擎并没有爬虫系统，因为所有的数据都是结构化的，一般都是Mysql或者 Oracle 的数据库，所以不用像百度一样用『爬虫』去不断去别的网站找内容，当然，电商其实也有自己的『爬虫』系统，一般都是抓取友商的价格，再对自己进行调整。</li>
+<li>第三点， 电商搜索引擎的过滤功能其实比搜索功能要常用，甚至大于搜索本身。什么是过滤功能？一般我们网站买东西的时候，搜了一个关健词，比如运动鞋，然后所有相关品牌或者其他分类的选择就会呈现在我们面前。对百度而言，搜什么词就是什么词，如果是新闻的话，可能在时间上会有一个过滤的选项。</li>
+<li>第四点， 电商搜索引擎支持各种维度的排序，包括支持人气、销量、信用、价格、发货地等属性的排序，且对数据的实时性要求非常高。对一般的搜索引擎，只有非常重要的网站，比如一些重量级的门户网站，百度的收录是非常快的，但是对那些流量很小的网站，可能一个月才会爬一次。电商搜索对数据的实时性要求主要体现在价格和库存两个方面。</li>
+<li>第五点， 电商搜索引擎的效果不仅要考虑买家（信息消费方，结果多样性），还得考虑卖家（信息提供方，曝光率）。</li>
+<li>第六点， 电商搜索引擎另一个特点就是不能丢品，比如我们在淘宝、天猫开了个店铺，然后好不容易搞了一次活动，但是却搜不到了，这是无法忍受的。除此之外，电商搜索引擎与推荐系统和广告系统是相互融合的，因为搜索引擎对流量的贡献是最大的，所以大家都希望把广告系统能跟其融合。</li>
+<li>第七点， 保证高可用，容灾、异常保护、降级(降级：QPS维度、在Clustermap上来做，正常来说，我们有20列，如果系统负载高的话查询只分布到10列，这样就高了1倍的QPS) 。异常保护：Latency 、在Searcher上来做，如果系统负载较高的话，Searcher上会直接丢弃一些耗时的Query。</li>
+</ul>
+<p><img src="https://ws1.sinaimg.cn/large/006ZfUPvgy1fwriewskf2j30hs0bwmx8.jpg" alt></p>
+<p>综上所述，电商系统中搜索引擎的必要性显而易见。</p>
+<h3><span id="搜索引擎页面结构图">搜索引擎页面结构图</span></h3><p><img src="https://ws1.sinaimg.cn/large/006ZfUPvgy1fwrijca5fkj30hs0b6mx5.jpg" alt></p>
+<h3><span id="搜索引擎系统架构图">搜索引擎系统架构图</span></h3><p><img src="https://ws1.sinaimg.cn/large/006ZfUPvgy1fwrik1f8wlj30hs13vgm4.jpg" alt></p>
+<h3><span id="搜索服务系统">搜索服务系统</span></h3><p>该系统真正接受用户请求并响应的系统。为了用户体验的需要，首先增加Query Processor服务，负责查询意图分析提升搜索的准确性。随着访问量的增长，接着增加缓存模块，提升请求处理性能。接着随着数据量（商品量）的增长，将CMS服务从检索服务中独立出去，成为Detail服务。数据量的进一步增长，对数据进行类似数据库分库分表的分片操作。这时候，在线检索服务由多个分片的Searcher列组成。自然而然，需要一个Merger服务，将多个分片的结果进行合并。</p>
+<h3><span id="搜索系统流程说明">搜索系统流程说明</span></h3><ol>
+<li>客户端请求通过Load Blance到Blender；</li>
+<li>Blender调用QP，QP调用运营平台，其中运营平台主要负责将日常运营数据服务化，QP负责分析Query；</li>
+<li>Blender请求Page Cache和Data Cache同时请求Merger调用在线搜索服务；</li>
+<li>Merger调用UserInfoSystem获取用户标签信息；</li>
+<li>Merger将请求发给每列Searcher；</li>
+<li>每个Searcher召回商品并返给Merger；</li>
+<li>Merger合并多列searcher的结果，确定需要输出的商品，请求CMS封装对应的商品信息；</li>
+<li>CMS封装商品信息返给Merger；</li>
+<li>Merger将包装好的商品返给Blender；</li>
+<li>Blender将Merger返回的结果与其他垂直搜索结果进行合并，最终返回给前端。</li>
+</ol>
+<p>为了保证高召回率和低响应延时，搜索服务流程的处理全部放在内存当中进行计算。多个Searcher并发处理请求，同时单个Searcher内部采用线程池技术，即所有线程之间共享倒排索引和商品属性信息，提高内存使用效率；每个查询使用一个独立线程串行执行，保证并发的多个查询线程之间互不影响。此外通过合理的设置线程池的大小，保证系统的CPU资源得到充分利用。并且采用多级缓存来保证系统的高可用。</p>
+<h3><span id="多级缓存策略">多级缓存策略</span></h3><p>Page Cache：由于搜索符合互联网的二八法则，20%热门查询频度非常高，占每天搜索请求量80%。针对这一特点，搜索第一级缓存以查询请求为Key，将返回给用户的页面作为Value。对于完全相同的请求，直接从缓存返回结果。页面缓存策略上线伊始，缓存命中率就接近了30%，基本解决了当时的性能问题。</p>
+<p>Data Cache：随着业务的发展，排序结果需要针对不同用户实现个性化订制，这就导致请求中会包含用户的UserInfo。如果直接将UserInfo放入缓存作为Key，会导致Data Cache的key数量激增，不但需要超大的缓存空间，同时缓存的命中率也会极低，最终会导致线上个性化服务的体验满意度降低。为了解决这个问题，将UserInfo加入Key，但是Value只保存排序好的商品ID，这样需要的缓存空间远远小于Data Cache。当命中缓存后，调用CMS直接进行结果包装。为了进一步提高缓存命中率，利用用户搜索的翻页习惯，即离线统计出用户的翻页数最大值，然后在Value中缓存这些页面涉及到所有的商品ID，从实践效果来看，用户后续的翻页请求大部分会命中Cache。</p>
+<h3><span id="索引系统">索引系统</span></h3><p>该系统是搜索技术的核心，在进入这个系统之前，搜索信息仍然是以商品维度进行存储的。索引系统负责生成一种以关键字维度进行存储的信息，一般称之为倒排索引。系统对于全量和增量的处理是一致的，唯一的区别在于待处理数据量的差异。一般情况下，全量数据索引由于数据量庞大，采用Hadoop进行；实时数据量小，采用单机进行索引生产。</p>
+<h3><span id="索引类型">索引类型</span></h3><h4><span id="倒排索引">倒排索引</span></h4><p>倒排索引（英语：Inverted index），也常被称为反向索引、置入档案或反向档案，是一种索引方法，被用来存储在全文搜索下某个单词在一个文档或者一组文档中的存储位置的映射，它是文档检索系统中最常用的数据结构。</p>
+<p>有两种不同的反向索引形式：</p>
+<ul>
+<li>一条记录的水平反向索引（或者反向档案索引）包含每个引用单词的文档的列表。</li>
+<li>一个单词的水平反向索引（或者完全反向索引）又包含每个单词在一个文档中的位置。</li>
+</ul>
+<p>后者的形式提供了更多的兼容性（比如短语搜索），但是需要更多的时间和空间来创建。<br>(REF:<a href="http://zh.wikipedia.org/wiki/%E5%80%92%E6%8E%92%E7%B4%A2%E5%BC%95" target="_blank" rel="noopener">http://zh.wikipedia.org/wiki/%E5%80%92%E6%8E%92%E7%B4%A2%E5%BC%95</a>)</p>
+<h5><span id="如何构建倒排索引">如何构建倒排索引</span></h5><p>Eg. 被索引的文本：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">    T0 = <span class="string">"it is what it is"</span></span><br><span class="line">    T1 = <span class="string">"what is it"</span></span><br><span class="line">    T2 = <span class="string">"it is a banana"</span></span><br><span class="line"><span class="string">``</span><span class="string">` </span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">得到的倒排索引：</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">`</span><span class="string">``</span>js</span><br><span class="line">    <span class="string">"a"</span>:    &#123;<span class="number">2</span>&#125;</span><br><span class="line">    <span class="string">"banana"</span>: &#123;<span class="number">2</span>&#125;</span><br><span class="line">    <span class="string">"is"</span>:  &#123;<span class="number">0</span>, <span class="number">1</span>, <span class="number">2</span>&#125;</span><br><span class="line">    <span class="string">"it"</span>:  &#123;<span class="number">0</span>, <span class="number">1</span>, <span class="number">2</span>&#125;</span><br><span class="line">    <span class="string">"what"</span>:   &#123;<span class="number">0</span>, <span class="number">1</span>&#125;</span><br></pre></td></tr></table></figure>
+<p>检索的条件”what”,”is”和”it”将对应集合的交集。</p>
+<p>正向索引开发出来用来存储每个文档的单词的列表。正向索引的查询往往满足每个文档有序频繁的全文查询和每个单词在校验文档中的验证这样的查询。在正向索引中，文档占据了中心的位置，每个文档指向了一个它所包含的索引项的序列。也就是说文档指向了它包含的那些单词，而反向索引则是单词指向了包含它的文档，很容易看到这个反向的关系。</p>
+<h5><span id="简单索引的文件格式">简单索引的文件格式</span></h5><p><img src="https://ws1.sinaimg.cn/large/006ZfUPvgy1fwriv1x6epj30hs066q2x.jpg" alt></p>
+<p>Index file可以采用闭链Hash的结构来存储，这样查询效率会很高，但是空间利用率很低。也可以对Key做排序后顺序存储，查询时使用二分查找。查询效率较低，但是不会浪费内存。Doclist file的存储就很简单了，整体来看就是一个Int型的数组，为了提高内存利用率，通常还会对Doclist进行压缩。</p>
+<p><strong>问题1：</strong><br>    假如有7亿的宝贝，其中有1亿宝贝标题中包含”正品”这个词，那么正品这个词的倒排链长度就是1亿</p>
+<p><strong>解决方案：</strong><br>    1，索引压缩<br>         要求：在解压速度快的基础上，压缩比尽量高</p>
+<pre><code>2，索引截断
+     要求：不影响用户体验的前提下，倒排链尽量短
+</code></pre><h3><span id="正排索引">正排索引</span></h3><p>一种索引方法，被用来存储在全文搜索下某个文档ID与其对应的部分字段存储位置的映射。正排表是以文档的ID为关键字，表中记录文档中每个字的位置信息，查找时扫描表中每个文档中字的信息直到找出所有包含查询关键字的文档。</p>
+<p><img src="https://ws1.sinaimg.cn/large/006ZfUPvgy1fwrixh33s9j30hs02mdfp.jpg" alt></p>
+<p><strong>问题2：</strong><br>    1，单台机器内存资源有限，如何容纳更多的文档？<br>    2，高并发下如何快速响应请求？</p>
+<p><img src="https://ws1.sinaimg.cn/large/006ZfUPvgy1fwriympsgoj30hs06xwed.jpg" alt></p>
+<p><strong>分布式的行、列概念</strong></p>
+<p>多行用于做负载均衡、冗余备份。如果我们一行能承担1000的QPS，那么10行就能承担1000*10的QPS，多列用于提高索引量。如果我们一台机器受限于内存只能放1000w的宝贝，那么1亿的宝贝就需要10台机器，也就是10列。<br>在分布式集群里，通常会有多行多列。当然如果数据量足够小，可以只有一列，但是考虑到容灾备份，就算流量非常低也会有至少2行。</p>
+<ul>
+<li>方案一：个性化搜索</li>
+<li>方案二：主搜索<br>   Ksearch与Isearch的区别：Ksearch是按Key来分布数据，而Isearch虽然也支持按Key查询，但是主要功能是分布式。</li>
+</ul>
+<h4><span id="检索过程">检索过程</span></h4><p><img src="https://ws1.sinaimg.cn/large/006ZfUPvgy1fwrj0tz59hj30hs0hvjrf.jpg" alt></p>
+<p><strong>问题3：</strong> 为什么做OR查询会比较影响性能？<br>    1，OR操作分配的内存空间不可预估，而且会很大<br>    2，合并的时候要遍历所有的倒排链<br>    3，倒排链越长意味着最后排序的数据就越多</p>
+<h3><span id="过滤统计排序">过滤统计排序</span></h3><p><img src="https://ws1.sinaimg.cn/large/006ZfUPvgy1fwrj3gd61tj30hs01rt8i.jpg" alt></p>
+<p><strong>问题4：</strong> 在分布式的集群中，假设我们要取销量排序第三页的宝贝，即s=80&amp;n=40。要如何获取？<br><strong>需要考虑的问题：</strong>    </p>
+<pre><code>- 我们的宝贝分布在不同的机器上
+- 排序效率要高
+- 也许某台机器上销量最差的宝贝也比其它机器上销量最好的宝贝要好
+</code></pre><p><strong>解决方案：</strong></p>
+<pre><code>每台Searcher机器返回Top120条结果Merger再将所有机器返回的Top120宝贝混到一起，再Heapsort取出Top 120
+</code></pre><h3><span id="rank">Rank</span></h3><p>常见问题：</p>
+<ul>
+<li>在人气，或者销量排序的时候马太效应怎么解决？</li>
+<li>马太效应：宝贝销量越高排名越靠前，越靠前销量越好</li>
+</ul>
+<p>首先：宝贝销量越高，确实搜索的排名会靠前，但是排名越靠前，只能说明搜索引导的成交会高一些，但是不会在大程度上影响宝贝的销量，因为搜索本身带来的成交才20-30%</p>
+<h4><span id="常用排序规则">常用排序规则</span></h4><ul>
+<li><p>阿基米德排序：</p>
+<pre><code>相关性(标题类目 亿级) + 下架时间(ends 千万级)  + 宝贝人气(百万级) + 卖家质量分(十万)
+</code></pre></li>
+<li><p>人气排序：</p>
+<pre><code>标题 （1）+ 类目（1）+ 宝贝人气（1）+ 卖（0.2）
+肯定不是用户想要的
+</code></pre></li>
+<li><p>单维度排序：</p>
+<pre><code>按照：销量，信用，价格，总价，单价排序
+单维度排序下不会做打散，可以认为这是用户的意愿只想找价格低的
+</code></pre></li>
+<li><p>类目混排：</p>
+<pre><code>类目混排会对宝贝按类目进行分档，档内才按价格排序
+打散：卖家打散，款式打散
+</code></pre></li>
+</ul>
+<h3><span id="anti-spam">Anti-spam</span></h3><p>降权与屏蔽<br>常见的作弊类型</p>
+<p><img src="https://ws1.sinaimg.cn/large/006ZfUPvgy1fwrj7jmx7tj30hs02c3yc.jpg" alt> </p>
+<ul>
+<li>为了提升用户体验，保证搜索的公平性，作弊是卖家通过一些不正当的行为，提高自己的搜索排名。</li>
+<li>虚假交易，包括炒作信用和炒作销量。以增加“会员积累信用”为目的或通过炒作商品销量提高商品人气而发布的商品，会被判定为虚假交易商品。</li>
+<li>通过发布完全相同的商品来争取更多的展现机会，直接降低了搜索的精准度，降低了消费者的购物体验，也是搜索控制的重点。</li>
+<li>商品描述不详、无实际商品、仅提供发布者联系方式以及非商品信息的商品，判定为发布广告商品。</li>
+<li>换宝贝：指卖家为了累积销量或人气，修改原有的商品的标题、价格、图片、详情等变成另外一种商品继续出售。</li>
+<li>Sku作弊：滥用商品属性（如：套餐），将常规商品和瑕疵品、单机、样机、模型、二手等非常规商品放在一个宝贝里出售，且一口价为非常规商品的价格。</li>
+</ul>
+<h2><span id="电商系统搜索和门户搜索的不同">电商系统搜索和门户搜索的不同</span></h2><p><img src="https://ws1.sinaimg.cn/large/006ZfUPvgy1fwrj8i8rs7j30hs0ejaaa.jpg" alt></p>
+<p>（注解：网站的PR值（全称为PageRank），是Google搜索排名算法中的一个组成部分，级别从1到10级，10级为满分，PR值越高说明该网页在搜索排名中的地位越重要）</p>
+<h2><span id="小结">小结：</span></h2><p>商业电商搜索算法另外两个重要技术，一个是类目体系建立和应用，另一个是个性化技术。</p>
+<p>类目体系目前主要使用机器学习的方法进行训练，个性化主要通过用户画像进行Query改写来实现。搜索算法是一个非常值得一个电商产品持续投入的技术，一方面如果技术人员要有良好的技术背景，可以借鉴很多成熟的技术，避免重复造轮子； 另一方面，每个产品的搜索都有自身的特点，需要深入研究产品的特性给出合理的解决方案。</p>
+<p>转载: <a href="https://mp.weixin.qq.com/s?src=11&amp;timestamp=1540972907&amp;ver=1215&amp;signature=OasCCvdyowfRZS1DjPxCyF1PoJxnXruAR78UZEqR1FBe6DAF6IZ7S*LqUey7StoANe*aVo8pax3hZI7QAKIHN1R3c51JBqX5l7ja-30zpsdw4gRxDdxeQNx7FgIaM30X&amp;new=1" target="_blank" rel="noopener">米么骚客</a></p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/ElasticSearch/" rel="tag"># ElasticSearch</a>
+          
+            <a href="/tags/分布式架构/" rel="tag"># 分布式架构</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/blog/2018/08/service-discovery-zookeepervsetcdvsconsul.html" rel="next" title="服务发现：ZooKeeper vs etcd vs Consul">
+                <i class="fa fa-chevron-left"></i> 服务发现：ZooKeeper vs etcd vs Consul
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/blog/2019/04/vim-command.html" rel="prev" title="Vim操作指令">
+                Vim操作指令 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image" src="/images/avatar.gif" alt="calfgz">
+          <p class="site-author-name" itemprop="name">calfgz</p>
+           
+              <p class="site-description motion-element" itemprop="description">Draw my work with code</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">29</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">9</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">31</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/calfgz" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#undefined"><span class="nav-number">1.</span> <span class="nav-text">什么搜索引擎</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#undefined"><span class="nav-number">1.1.</span> <span class="nav-text">电商搜索业务特点</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#undefined"><span class="nav-number">1.2.</span> <span class="nav-text">搜索引擎页面结构图</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#undefined"><span class="nav-number">1.3.</span> <span class="nav-text">搜索引擎系统架构图</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#undefined"><span class="nav-number">1.4.</span> <span class="nav-text">搜索服务系统</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#undefined"><span class="nav-number">1.5.</span> <span class="nav-text">搜索系统流程说明</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#undefined"><span class="nav-number">1.6.</span> <span class="nav-text">多级缓存策略</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#undefined"><span class="nav-number">1.7.</span> <span class="nav-text">索引系统</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#undefined"><span class="nav-number">1.8.</span> <span class="nav-text">索引类型</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">1.8.1.</span> <span class="nav-text">倒排索引</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#undefined"><span class="nav-number">1.8.1.1.</span> <span class="nav-text">如何构建倒排索引</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#undefined"><span class="nav-number">1.8.1.2.</span> <span class="nav-text">简单索引的文件格式</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#undefined"><span class="nav-number">1.9.</span> <span class="nav-text">正排索引</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">1.9.1.</span> <span class="nav-text">检索过程</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#undefined"><span class="nav-number">1.10.</span> <span class="nav-text">过滤统计排序</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#undefined"><span class="nav-number">1.11.</span> <span class="nav-text">Rank</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">1.11.1.</span> <span class="nav-text">常用排序规则</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#undefined"><span class="nav-number">1.12.</span> <span class="nav-text">Anti-spam</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#undefined"><span class="nav-number">2.</span> <span class="nav-text">电商系统搜索和门户搜索的不同</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#undefined"><span class="nav-number">3.</span> <span class="nav-text">小结：</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy;  2017 - 
+  <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">calfgz</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,887 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css">
+
+
+  <meta name="keywords" content="网站架构,分布式架构,负载均衡,Nginx,">
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="牛犊记" type="application/atom+xml">
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1">
+
+
+
+
+
+
+<meta name="description" content="软件负载均衡概述 硬件负载均衡性能优越，功能全面，但是价格昂贵，一般适合初期或者土豪级公司长期使用。因此软件负载均衡在互联网领域大量使用。常用的软件负载均衡软件有Nginx，Lvs，HaProxy等。本文参考大量文档，部分为直接拷贝，参考出处见负载均衡详解（4）。 Nginx负载均衡 Nginx是一款轻量级的Web服务器/反向代理服务器，工作在七层Http协议的负载均衡系统。具有高性能、高并发、低">
+<meta name="keywords" content="网站架构,分布式架构,负载均衡,Nginx">
+<meta property="og:type" content="article">
+<meta property="og:title" content="负载均衡详解之软件篇[转]">
+<meta property="og:url" content="http://calfgz.github.io/blog/2017/08/architecture-load-balance-software.html">
+<meta property="og:site_name" content="牛犊记">
+<meta property="og:description" content="软件负载均衡概述 硬件负载均衡性能优越，功能全面，但是价格昂贵，一般适合初期或者土豪级公司长期使用。因此软件负载均衡在互联网领域大量使用。常用的软件负载均衡软件有Nginx，Lvs，HaProxy等。本文参考大量文档，部分为直接拷贝，参考出处见负载均衡详解（4）。 Nginx负载均衡 Nginx是一款轻量级的Web服务器/反向代理服务器，工作在七层Http协议的负载均衡系统。具有高性能、高并发、低">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://calfgz.github.io/images/architecture-load-balance-software/001.jpg">
+<meta property="og:image" content="http://calfgz.github.io/images/architecture-load-balance-software/002.jpg">
+<meta property="og:image" content="http://calfgz.github.io/images/architecture-load-balance-software/003.jpg">
+<meta property="og:image" content="http://calfgz.github.io/images/architecture-load-balance-software/004.jpg">
+<meta property="og:image" content="http://calfgz.github.io/images/architecture-load-balance-software/005.png">
+<meta property="og:image" content="http://calfgz.github.io/images/architecture-load-balance-software/006.png">
+<meta property="og:image" content="http://calfgz.github.io/images/architecture-load-balance-software/007.png">
+<meta property="og:image" content="http://calfgz.github.io/images/architecture-load-balance-software/008.png">
+<meta property="og:updated_time" content="2019-04-28T07:38:07.341Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="负载均衡详解之软件篇[转]">
+<meta name="twitter:description" content="软件负载均衡概述 硬件负载均衡性能优越，功能全面，但是价格昂贵，一般适合初期或者土豪级公司长期使用。因此软件负载均衡在互联网领域大量使用。常用的软件负载均衡软件有Nginx，Lvs，HaProxy等。本文参考大量文档，部分为直接拷贝，参考出处见负载均衡详解（4）。 Nginx负载均衡 Nginx是一款轻量级的Web服务器/反向代理服务器，工作在七层Http协议的负载均衡系统。具有高性能、高并发、低">
+<meta name="twitter:image" content="http://calfgz.github.io/images/architecture-load-balance-software/001.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://calfgz.github.io/blog/2017/08/architecture-load-balance-software.html">
+
+
+
+
+
+  <title>负载均衡详解之软件篇[转] | 牛犊记</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?eb8a0170f0ad9db33295cfbe2dc5b699";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">牛犊记</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://calfgz.github.io/blog/2017/08/architecture-load-balance-software.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="calfgz">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="牛犊记">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">负载均衡详解之软件篇[转]</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-08-24T16:31:59+08:00">
+                2017-08-24
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/大型分布式网站架构/" itemprop="url" rel="index">
+                    <span itemprop="name">大型分布式网站架构</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2><span id="软件负载均衡概述">软件负载均衡概述</span></h2><hr>
+<p>硬件负载均衡性能优越，功能全面，但是价格昂贵，一般适合初期或者土豪级公司长期使用。因此软件负载均衡在互联网领域大量使用。常用的软件负载均衡软件有Nginx，Lvs，HaProxy等。本文参考大量文档，部分为直接拷贝，参考出处见负载均衡详解（4）。</p>
+<h2><span id="nginx负载均衡">Nginx负载均衡</span></h2><hr>
+<p>Nginx是一款轻量级的Web服务器/反向代理服务器，工作在七层Http协议的负载均衡系统。具有高性能、高并发、低内存使用等特点。是一个轻量级的Http和反向代理服务器。Nginx使用epoll and kqueue作为开发模型。能够支持高达 50,000 个并发连接数的响应。</p>
+<p>操作系统：Liunx，Windows（Linux、FreeBSD、Solaris、Mac OS X、AIX以及Microsoft Windows）</p>
+<p>开发语言：C</p>
+<p>并发性能：官方支持每秒5万并发，实际国内一般到每秒2万并发，有优化到每秒10万并发的。具体性能看应用场景。</p>
+<h3><span id="特点">特点</span></h3><ol>
+<li>模块化设计：良好的扩展性，可以通过模块方式进行功能扩展。</li>
+<li>高可靠性：主控进程和worker是同步实现的，一个worker出现问题，会立刻启动另一个worker。</li>
+<li>内存消耗低：一万个长连接（keep-alive）,仅消耗2.5MB内存。</li>
+<li>支持热部署：不用停止服务器，实现更新配置文件，更换日志文件、更新服务器程序版本。</li>
+<li>并发能力强：官方数据每秒支持5万并发；</li>
+<li>功能丰富：优秀的反向代理功能和灵活的负载均衡策略</li>
+</ol>
+<h3><span id="功能">功能</span></h3><h4><span id="基本功能">基本功能</span></h4><ul>
+<li>支持静态资源的web服务器。</li>
+<li>http,smtp,pop3协议的反向代理服务器、缓存、负载均衡；</li>
+<li>支持FASTCGI（fpm）</li>
+<li>支持模块化，过滤器（让文本可以实现压缩，节约带宽）,ssl及图像大小调整。</li>
+<li>内置的健康检查功能</li>
+<li>基于名称和ip的虚拟主机</li>
+<li>定制访问日志</li>
+<li>支持平滑升级</li>
+<li>支持KEEPALIVE</li>
+<li>支持url rewrite</li>
+<li>支持路径别名</li>
+<li>支持基于IP和用户名的访问控制。</li>
+<li>支持传输速率限制，支持并发数限制。</li>
+</ul>
+<h4><span id="扩展功能">扩展功能</span></h4><h4><span id="性能">性能</span></h4><p>Nginx的高并发，官方测试支持5万并发连接。实际生产环境能到2-3万并发连接数。10000个非活跃的HTTP keep-alive 连接仅占用约2.5MB内存。三万并发连接下，10个Nginx进程，消耗内存150M。淘宝tengine团队测试结果是“24G内存机器上，处理并发请求可达200万”。</p>
+<h3><span id="架构">架构</span></h3><h4><span id="nginx的基本工作模式">Nginx的基本工作模式</span></h4><p><img src="/images/architecture-load-balance-software/001.jpg" alt="软件负载均衡详解-Nginx基本工作模式"></p>
+<p>一个master进程，生成一个或者多个worker进程。但是这里master是使用root身份启动的，因为nginx要工作在80端口。而只有管理员才有权限启动小于低于1023的端口。master主要是负责的作用只是启动worker，加载配置文件，负责系统的平滑升级。其它的工作是交给worker。那么当worker被启动之后，也只是负责一些web最简单的工作，而其他的工作都是有worker中调用的模块来实现的。</p>
+<p>模块之间是以流水线的方式实现功能的。流水线，指的是一个用户请求，由多个模块组合各自的功能依次实现完成的。比如：第一个模块只负责分析请求首部，第二个模块只负责查找数据，第三个模块只负责压缩数据，依次完成各自工作。来实现整个工作的完成。</p>
+<p>他们是如何实现热部署的呢？其实是这样的，我们前面说master不负责具体的工作，而是调用worker工作，他只是负责读取配置文件，因此当一个模块修改或者配置文件发生变化，是由master进行读取，因此此时不会影响到worker工作。在master进行读取配置文件之后，不会立即的把修改的配置文件告知worker。而是让被修改的worker继续使用老的配置文件工作，当worker工作完毕之后，直接当掉这个子进程，更换新的子进程，使用新的规则。</p>
+<h4><span id="nginx支持的sendfile机制">Nginx支持的sendfile机制</span></h4><p>Sendfile机制，用户将请求发给内核，内核根据用户的请求调用相应用户进程，进程在处理时需要资源。此时再把请求发给内核（进程没有直接IO的能力），由内核加载数据。内核查找到数据之后，会把数据复制给用户进程，由用户进程对数据进行封装，之后交给内核，内核在进行tcp/ip首部的封装，最后再发给客户端。这个功能用户进程只是发生了一个封装报文的过程，却要绕一大圈。因此nginx引入了sendfile机制，使得内核在接受到数据之后，不再依靠用户进程给予封装，而是自己查找自己封装，减少了一个很长一段时间的浪费，这是一个提升性能的核心点。</p>
+<p><img src="/images/architecture-load-balance-software/002.jpg" alt="软件负载均衡详解-Nginx基本工作模式"></p>
+<p>以上内容摘自网友发布的文章，简单一句话是资源的处理，直接通过内核层进行数据传递，避免了数据传递到应用层，应用层再传递到内核层的开销。</p>
+<p>目前高并发的处理，一般都采用sendfile模式。通过直接操作内核层数据，减少应用与内核层数据传递。</p>
+<h4><span id="nginx通信模型io复用机制">Nginx通信模型（I/O复用机制）</span></h4><ul>
+<li>开发模型：epoll和kqueue。</li>
+<li>支持的事件机制：kqueue、epoll、rt signals、/dev/poll 、event ports、select以及poll。</li>
+<li>支持的kqueue特性包括EV_CLEAR、EV_DISABLE、NOTE_LOWAT、EV_EOF，可用数据的数量，错误代码.</li>
+<li>支持sendfile、sendfile64和sendfilev;文件AIO；DIRECTIO;支持Accept-filters和TCP_DEFER_ACCEP.</li>
+</ul>
+<p>以上概念较多，大家自行百度或谷歌，知识领域是网络通信（BIO,NIO,AIO）和多线程方面的知识。</p>
+<h3><span id="均衡策略">均衡策略</span></h3><p>nginx的负载均衡策略可以划分为两大类：内置策略和扩展策略。内置策略包含加权轮询和ip hash，在默认情况下这两种策略会编译进nginx内核，只需在nginx配置中指明参数即可。扩展策略有很多，如fair、通用hash、consistent hash等，默认不编译进nginx内核。由于在nginx版本升级中负载均衡的代码没有本质性的变化，因此下面将以nginx1.0.15稳定版为例，从源码角度分析各个策略。</p>
+<h4><span id="加权轮询weighted-round-robin">加权轮询（weighted round robin）</span></h4><p>轮询的原理很简单，首先我们介绍一下轮询的基本流程。如下是处理一次请求的流程图：</p>
+<p><img src="/images/architecture-load-balance-software/003.jpg" alt="软件负载均衡详解-Nginx流程图"></p>
+<p>图中有两点需要注意，第一，如果可以把加权轮询算法分为先深搜索和先广搜索，那么nginx采用的是先深搜索算法，即将首先将请求都分给高权重的机器，直到该机器的权值降到了比其他机器低，才开始将请求分给下一个高权重的机器；第二，当所有后端机器都down掉时，nginx会立即将所有机器的标志位清成初始状态，以避免造成所有的机器都处在timeout的状态，从而导致整个前端被夯住。</p>
+<h4><span id="ip-hash">ip hash</span></h4><p>ip hash是nginx内置的另一个负载均衡的策略，流程和轮询很类似，只是其中的算法和具体的策略有些变化，如下图所示：</p>
+<p><img src="/images/architecture-load-balance-software/004.jpg" alt="软件负载均衡详解-Nginx IPHash流程图"></p>
+<h4><span id="fair">fair</span></h4><p>fair策略是扩展策略，默认不被编译进nginx内核。其原理是根据后端服务器的响应时间判断负载情况，从中选出负载最轻的机器进行分流。这种策略具有很强的自适应性，但是实际的网络环境往往不是那么简单，因此要慎用。</p>
+<h4><span id="通用hash-一致性hash">通用hash、一致性hash</span></h4><p>这两种也是扩展策略，在具体的实现上有些差别，通用hash比较简单，可以以nginx内置的变量为key进行hash，一致性hash采用了nginx内置的一致性hash环，可以支持memcache。</p>
+<h3><span id="场景">场景</span></h3><p>Nginx一般作为入口负载均衡或内部负载均衡，结合反向代理服务器使用。以下架构示例，仅供参考，具体使用根据场景而定。</p>
+<h4><span id="入口负载均衡架构">入口负载均衡架构</span></h4><p><img src="/images/architecture-load-balance-software/005.png" alt="软件负载均衡详解-Nginx入口负载均衡"></p>
+<p>Nginx服务器在用户访问的最前端。根据用户请求再转发到具体的应用服务器或二级负载均衡服务器（LVS）</p>
+<h4><span id="内部负载均衡架构">内部负载均衡架构</span></h4><p><img src="/images/architecture-load-balance-software/006.png" alt="软件负载均衡详解-Nginx内部负载均衡"></p>
+<p>LVS作为入口负载均衡，将请求转发到二级Nginx服务器，Nginx再根据请求转发到具体的应用服务器。</p>
+<h4><span id="nginx高可用">Nginx高可用</span></h4><p><img src="/images/architecture-load-balance-software/007.png" alt="软件负载均衡详解-Nginx高可用性"></p>
+<p>分布式系统中，应用只部署一台服务器会存在单点故障，负载均衡同样有类似的问题。一般可采用主备或负载均衡设备集群的方式节约单点故障或高并发请求分流。</p>
+<p>Nginx高可用，至少包含两个Nginx服务器，一台主服务器，一台备服务器，之间使用Keepalived做健康监控和故障检测。开放VIP端口，通过防火墙进行外部映射。</p>
+<p>DNS解析公网的IP实际为VIP。</p>
+<h2><span id="lvs负载均衡">LVS负载均衡</span></h2><hr>
+<p>LVS是一个开源的软件，由毕业于国防科技大学的章文嵩博士于1998年5月创立，用来实现Linux平台下的简单负载均衡。LVS是Linux Virtual Server的缩写，意思是Linux虚拟服务器。</p>
+<p>基于IP层的负载均衡调度技术，它在操作系统核心层上，将来自IP层的TCP/UDP请求均衡地转移到不同的 服务器，从而将一组服务器构成一个高性能、高可用的虚拟服务器。</p>
+<p>操作系统：Liunx<br>开发语言：C<br>并发性能：默认4096，可以修改但需要重新编译。</p>
+<h3><span id="功能">功能</span></h3><p>LVS的主要功能是实现IP层（网络层）负载均衡，有NAT,TUN,DR三种请求转发模式。</p>
+<h4><span id="lvsnat方式的负载均衡集群">LVS/NAT方式的负载均衡集群</span></h4><p>NAT是指Network Address Translation，它的转发流程是：Director机器收到外界请求，改写数据包的目标地址，按相应的调度算法将其发送到相应Real Server上，Real Server处理完该请求后，将结果数据包返回到其默认网关，即Director机器上，Director机器再改写数据包的源地址，最后将其返回给外界。这样就完成一次负载调度。</p>
+<p>构架一个最简单的LVS/NAT方式的负载均衡集群Real Server可以是任何的操作系统，而且无需做任何特殊的设定，惟一要做的就是将其默认网关指向Director机器。Real Server可以使用局域网的内部IP(192.168.0.0/24)。Director要有两块网卡，一块网卡绑定一个外部IP地址 (10.0.0.1)，另一块网卡绑定局域网的内部IP(192.168.0.254)，作为Real Server的默认网关。</p>
+<p>LVS/NAT方式实现起来最为简单，而且Real Server使用的是内部IP，可以节省Real IP的开销。但因为执行NAT需要重写流经Director的数据包，在速度上有一定延迟；</p>
+<p>当用户的请求非常短，而服务器的回应非常大的情况下，会对Director形成很大压力，成为新的瓶颈，从而使整个系统的性能受到限制。</p>
+<h4><span id="lvstun方式的负载均衡集群">LVS/TUN方式的负载均衡集群</span></h4><p>TUN是指IP Tunneling，它的转发流程是：Director机器收到外界请求，按相应的调度算法,通过IP隧道发送到相应Real Server，Real Server处理完该请求后，将结果数据包直接返回给客户。至此完成一次负载调度。</p>
+<p>最简单的LVS/TUN方式的负载均衡集群架构使用IP Tunneling技术，在Director机器和Real Server机器之间架设一个IP Tunnel，通过IP Tunnel将负载分配到Real Server机器上。Director和Real Server之间的关系比较松散，可以是在同一个网络中，也可以是在不同的网络中，只要两者能够通过IP Tunnel相连就行。收到负载分配的Real Server机器处理完后会直接将反馈数据送回给客户，而不必通过Director机器。实际应用中，服务器必须拥有正式的IP地址用于与客户机直接通信，并且所有服务器必须支持IP隧道协议。</p>
+<p>该方式中Director将客户请求分配到不同的Real Server，Real Server处理请求后直接回应给用户，这样Director就只处理客户机与服务器的一半连接，极大地提高了Director的调度处理能力，使集群系统能容纳更多的节点数。另外TUN方式中的Real Server可以在任何LAN或WAN上运行，这样可以构筑跨地域的集群，其应对灾难的能力也更强，但是服务器需要为IP封装付出一定的资源开销，而且后端的Real Server必须是支持IP Tunneling的操作系统。</p>
+<h4><span id="lvstun方式的负载均衡集群">LVS/TUN方式的负载均衡集群</span></h4><p>DR是指Direct Routing，它的转发流程是：Director机器收到外界请求，按相应的调度算法将其直接发送到相应Real Server，Real Server处理完该请求后，将结果数据包直接返回给客户，完成一次负载调度。</p>
+<p>构架一个最简单的LVS/DR方式的负载均衡集群Real Server和Director都在同一个物理网段中，Director的网卡IP是192.168.0.253，再绑定另一个IP： 192.168.0.254作为对外界的virtual IP，外界客户通过该IP来访问整个集群系统。Real Server在lo上绑定IP：192.168.0.254，同时加入相应的路由。</p>
+<p>LVS/DR方式与前面的LVS/TUN方式有些类似，前台的Director机器也是只需要接收和调度外界的请求，而不需要负责返回这些请求的反馈结果，所以能够负载更多的Real Server，提高Director的调度处理能力，使集群系统容纳更多的Real Server。但LVS/DR需要改写请求报文的MAC地址，所以所有服务器必须在同一物理网段内。</p>
+<h3><span id="架构">架构</span></h3><p>LVS架设的服务器集群系统有三个部分组成：最前端的负载均衡层（Loader Balancer），中间的服务器群组层，用Server Array表示，最底层的数据共享存储层，用Shared Storage表示。在用户看来所有的应用都是透明的，用户只是在使用一个虚拟服务器提供的高性能服务。</p>
+<p>LVS的体系架构如图：<br><img src="/images/architecture-load-balance-software/008.png" alt="软件负载均衡详解-LVS架构图"></p>
+<p>LVS的各个层次的详细介绍：</p>
+<ul>
+<li>Load Balancer层：位于整个集群系统的最前端，有一台或者多台负载调度器（Director Server）组成，LVS模块就安装在Director Server上，而Director的主要作用类似于一个路由器，它含有完成LVS功能所设定的路由表，通过这些路由表把用户的请求分发给Server Array层的应用服务器（Real Server）上。同时，在Director Server上还要安装对Real Server服务的监控模块Ldirectord，此模块用于监测各个Real Server服务的健康状况。在Real Server不可用时把它从LVS路由表中剔除，恢复时重新加入。</li>
+<li>Server Array层：由一组实际运行应用服务的机器组成，Real Server可以是WEB服务器、MAIL服务器、FTP服务器、DNS服务器、视频服务器中的一个或者多个，每个Real Server之间通过高速的LAN或分布在各地的WAN相连接。在实际的应用中，Director Server也可以同时兼任Real Server的角色。</li>
+<li>Shared Storage层：是为所有Real Server提供共享存储空间和内容一致性的存储区域，在物理上，一般有磁盘阵列设备组成，为了提供内容的一致性，一般可以通过NFS网络文件系统共享数 据，但是NFS在繁忙的业务系统中，性能并不是很好，此时可以采用集群文件系统，例如Red hat的GFS文件系统，oracle提供的OCFS2文件系统等。</li>
+</ul>
+<p>从整个LVS结构可以看出，Director Server是整个LVS的核心，目前，用于Director Server的操作系统只能是Linux和FreeBSD，linux2.6内核不用任何设置就可以支持LVS功能，而FreeBSD作为 Director Server的应用还不是很多，性能也不是很好。对于Real Server，几乎可以是所有的系统平台，Linux、windows、Solaris、AIX、BSD系列都能很好的支持。</p>
+<h3><span id="均衡策略">均衡策略</span></h3><p>LVS默认支持八种负载均衡策略，简述如下：</p>
+<h4><span id="轮询调度round-robin">轮询调度（Round Robin）</span></h4><p>调度器通过“轮询”调度算法将外部请求按顺序轮流分配到集群中的真实服务器上，它均等地对待每一台服务器，而不管服务器上实际的连接数和系统负载。</p>
+<h4><span id="加权轮询weighted-round-robin">加权轮询（Weighted Round Robin）</span></h4><p>调度器通过“加权轮询”调度算法根据真实服务器的不同处理能力来调度访问请求。这样可以保证处理能力强的服务器能处理更多的访问流量。调度器可以自动问询真实服务器的负载情况，并动态地调整其权值。</p>
+<h4><span id="最少链接least-connections">最少链接（Least Connections）</span></h4><p>调度器通过“最少连接”调度算法动态地将网络请求调度到已建立的链接数最少的服务器上。如果集群系统的真实服务器具有相近的系统性能，采用“最小连接”调度算法可以较好地均衡负载。</p>
+<h4><span id="加权最少链接weighted-least-connections">加权最少链接（Weighted Least Connections）</span></h4><p>在集群系统中的服务器性能差异较大的情况下，调度器采用“加权最少链接”调度算法优化负载均衡性能，具有较高权值的服务器将承受较大比例的活动连接负载。调度器可以自动问询真实服务器的负载情况，并动态地调整其权值。</p>
+<h4><span id="基于局部性的最少链接locality-based-least-connections">基于局部性的最少链接（Locality-Based Least Connections）</span></h4><p>“基于局部性的最少链接”调度算法是针对目标IP地址的负载均衡，目前主要用于Cache集群系统。该算法根据请求的目标IP地址找出该目标IP地址最近使用的服务器，若该服务器是可用的且没有超载，将请求发送到该服务器；若服务器不存在，或者该服务器超载且有服务器处于一半的工作负载，则用“最少链接” 的原则选出一个可用的服务器，将请求发送到该服务器。</p>
+<h4><span id="带复制的基于局部性最少链接locality-based-least-connections-with-replication">带复制的基于局部性最少链接（Locality-Based Least Connections with Replication）</span></h4><p>“带复制的基于局部性最少链接”调度算法也是针对目标IP地址的负载均衡，目前主要用于Cache集群系统。它与LBLC算法的不同之处是它要维护从一个目标IP地址到一组服务器的映射，而LBLC算法维护从一个目标IP地址到一台服务器的映射。该算法根据请求的目标IP地址找出该目标IP地址对应的服务器组，按“最小连接”原则从服务器组中选出一台服务器，若服务器没有超载，将请求发送到该服务器；若服务器超载，则按“最小连接”原则从这个集群中选出一台服务器，将该服务器加入到服务器组中，将请求发送到该服务器。同时，当该服务器组有一段时间没有被修改，将最忙的服务器从服务器组中删除，以降低复制的程度。</p>
+<h4><span id="目标地址散列destination-hashing">目标地址散列（Destination Hashing）</span></h4><p>“目标地址散列”调度算法根据请求的目标IP地址，作为散列键（Hash Key）从静态分配的散列表找出对应的服务器，若该服务器是可用的且未超载，将请求发送到该服务器，否则返回空。</p>
+<h4><span id="源地址散列source-hashing">源地址散列（Source Hashing）</span></h4><p>“源地址散列”调度算法根据请求的源IP地址，作为散列键（Hash Key）从静态分配的散列表找出对应的服务器，若该服务器是可用的且未超载，将请求发送到该服务器，否则返回空。</p>
+<p>除具备以上负载均衡算法外，还可以自定义均衡策略。</p>
+<h3><span id="场景">场景</span></h3><p>一般作为入口负载均衡或内部负载均衡，结合反向代理服务器使用。相关架构可参考Ngnix场景架构。</p>
+<h2><span id="haproxy负载均衡">HaProxy负载均衡</span></h2><hr>
+<p>HAProxy也是使用较多的一款负载均衡软件。HAProxy提供高可用性、负载均衡以及基于TCP和HTTP应用的代理，支持虚拟主机，是免费、快速并且可靠的一种解决方案。特别适用于那些负载特大的web站点。运行模式使得它可以很简单安全的整合到当前的架构中，同时可以保护你的web服务器不被暴露到网络上。</p>
+<h3><span id="特点">特点</span></h3><ul>
+<li>支持两种代理模式：TCP（四层）和HTTP（七层），支持虚拟主机；</li>
+<li>配置简单，支持url检测后端服务器状态；</li>
+<li>做负载均衡软件使用，在高并发情况下，处理速度高于nginx；</li>
+<li>TCP层多用于Mysql从（读）服务器负载均衡。 （对Mysql进行负载均衡，对后端的DB节点进行检测和负载均衡）</li>
+<li>能够补充Nginx的一些缺点比如Session的保持，Cookie引导等工作</li>
+</ul>
+<h3><span id="均衡策略">均衡策略</span></h3><p>支持四种常用算法：</p>
+<ol>
+<li>roundrobin：轮询，轮流分配到后端服务器；</li>
+<li>static-rr：根据后端服务器性能分配；</li>
+<li>leastconn：最小连接者优先处理；</li>
+<li>source：根据请求源IP，与Nginx的IP_Hash类似。</li>
+</ol>
+<hr>
+<p>参考资料：<br><a href="http://www.server110.com/nginx/201403/7225.html" target="_blank" rel="noopener">Nginx负载均衡实现原理图解</a><br><a href="http://linux.it.net.cn/e/server/nginx/2015/0102/11183.html" target="_blank" rel="noopener">Nginx架构及其web服务搭建优化配置详解</a><br><a href="http://network.51cto.com/art/201109/288597.htm" target="_blank" rel="noopener">Ngnix双主场景</a><br><a href="http://blog.chinaunix.net/uid-45094-id-3012037.html" target="_blank" rel="noopener">用LVS构架负载均衡Linux集群系统 linux lvs</a><br><a href="http://os.51cto.com/art/201202/317108.htm" target="_blank" rel="noopener">LVS基本介绍</a></p>
+<p>转载: <a href="http://www.cnblogs.com/itfly8/p/5080743.html" target="_blank" rel="noopener">ITFLY8架构师之家</a></p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/网站架构/" rel="tag"># 网站架构</a>
+          
+            <a href="/tags/分布式架构/" rel="tag"># 分布式架构</a>
+          
+            <a href="/tags/负载均衡/" rel="tag"># 负载均衡</a>
+          
+            <a href="/tags/Nginx/" rel="tag"># Nginx</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/blog/2017/08/architecture-load-balance.html" rel="next" title="负载均衡详解[转]">
+                <i class="fa fa-chevron-left"></i> 负载均衡详解[转]
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/blog/2017/08/architecture-mq.html" rel="prev" title="分布式消息队列[转]">
+                分布式消息队列[转] <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image" src="/images/avatar.gif" alt="calfgz">
+          <p class="site-author-name" itemprop="name">calfgz</p>
+           
+              <p class="site-description motion-element" itemprop="description">Draw my work with code</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">29</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">9</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">31</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/calfgz" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#undefined"><span class="nav-number">1.</span> <span class="nav-text">软件负载均衡概述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#undefined"><span class="nav-number">2.</span> <span class="nav-text">Nginx负载均衡</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#undefined"><span class="nav-number">2.1.</span> <span class="nav-text">特点</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#undefined"><span class="nav-number">2.2.</span> <span class="nav-text">功能</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">2.2.1.</span> <span class="nav-text">基本功能</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">2.2.2.</span> <span class="nav-text">扩展功能</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">2.2.3.</span> <span class="nav-text">性能</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#undefined"><span class="nav-number">2.3.</span> <span class="nav-text">架构</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">2.3.1.</span> <span class="nav-text">Nginx的基本工作模式</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">2.3.2.</span> <span class="nav-text">Nginx支持的sendfile机制</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">2.3.3.</span> <span class="nav-text">Nginx通信模型（I/O复用机制）</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#undefined"><span class="nav-number">2.4.</span> <span class="nav-text">均衡策略</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">2.4.1.</span> <span class="nav-text">加权轮询（weighted round robin）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">2.4.2.</span> <span class="nav-text">ip hash</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">2.4.3.</span> <span class="nav-text">fair</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">2.4.4.</span> <span class="nav-text">通用hash、一致性hash</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#undefined"><span class="nav-number">2.5.</span> <span class="nav-text">场景</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">2.5.1.</span> <span class="nav-text">入口负载均衡架构</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">2.5.2.</span> <span class="nav-text">内部负载均衡架构</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">2.5.3.</span> <span class="nav-text">Nginx高可用</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#undefined"><span class="nav-number">3.</span> <span class="nav-text">LVS负载均衡</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#undefined"><span class="nav-number">3.1.</span> <span class="nav-text">功能</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">3.1.1.</span> <span class="nav-text">LVS/NAT方式的负载均衡集群</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">3.1.2.</span> <span class="nav-text">LVS/TUN方式的负载均衡集群</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">3.1.3.</span> <span class="nav-text">LVS/TUN方式的负载均衡集群</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#undefined"><span class="nav-number">3.2.</span> <span class="nav-text">架构</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#undefined"><span class="nav-number">3.3.</span> <span class="nav-text">均衡策略</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">3.3.1.</span> <span class="nav-text">轮询调度（Round Robin）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">3.3.2.</span> <span class="nav-text">加权轮询（Weighted Round Robin）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">3.3.3.</span> <span class="nav-text">最少链接（Least Connections）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">3.3.4.</span> <span class="nav-text">加权最少链接（Weighted Least Connections）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">3.3.5.</span> <span class="nav-text">基于局部性的最少链接（Locality-Based Least Connections）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">3.3.6.</span> <span class="nav-text">带复制的基于局部性最少链接（Locality-Based Least Connections with Replication）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">3.3.7.</span> <span class="nav-text">目标地址散列（Destination Hashing）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">3.3.8.</span> <span class="nav-text">源地址散列（Source Hashing）</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#undefined"><span class="nav-number">3.4.</span> <span class="nav-text">场景</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#undefined"><span class="nav-number">4.</span> <span class="nav-text">HaProxy负载均衡</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#undefined"><span class="nav-number">4.1.</span> <span class="nav-text">特点</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#undefined"><span class="nav-number">4.2.</span> <span class="nav-text">均衡策略</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy;  2017 - 
+  <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">calfgz</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

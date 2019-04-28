@@ -1,0 +1,957 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css">
+
+
+  <meta name="keywords" content="ElasticSearch,电商,">
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="牛犊记" type="application/atom+xml">
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1">
+
+
+
+
+
+
+<meta name="description" content="##背景 随着互联网数据规模的爆炸式增长，如何从海量的历史，实时数据中快速获取有用的信息，变得越来越有挑战性。 电商数据系统主要类型一个中等的电商平台，每天都要产生百万条原始数据，上亿条用户行为数据。一般来说，电商数据一般有3种主要类型的数据系统：  关系型数据库 ，大多数互联网公司会选用mysql作为关数据库的主选，用于存储商品，用户信息等数据。 关系型数据库对于事务性非常高的OLTP操作(比如">
+<meta name="keywords" content="ElasticSearch,电商">
+<meta property="og:type" content="article">
+<meta property="og:title" content="使用Elasticsearch构建电商搜索平台实践案例[转]">
+<meta property="og:url" content="http://calfgz.github.io/blog/2018/07/elasticsearch-e-commerce.html">
+<meta property="og:site_name" content="牛犊记">
+<meta property="og:description" content="##背景 随着互联网数据规模的爆炸式增长，如何从海量的历史，实时数据中快速获取有用的信息，变得越来越有挑战性。 电商数据系统主要类型一个中等的电商平台，每天都要产生百万条原始数据，上亿条用户行为数据。一般来说，电商数据一般有3种主要类型的数据系统：  关系型数据库 ，大多数互联网公司会选用mysql作为关数据库的主选，用于存储商品，用户信息等数据。 关系型数据库对于事务性非常高的OLTP操作(比如">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://cdn.www.sojson.com/file/16-09-13-17-20-00/doc/4155822960">
+<meta property="og:image" content="https://cdn.www.sojson.com/file/16-09-13-17-22-07/doc/8749385194">
+<meta property="og:image" content="https://cdn.www.sojson.com/file/16-09-13-17-23-48/doc/6444274439">
+<meta property="og:image" content="https://cdn.www.sojson.com/file/16-09-13-17-26-48/doc/1686251170">
+<meta property="og:image" content="https://cdn.www.sojson.com/file/16-09-13-17-29-33/doc/4071445009">
+<meta property="og:image" content="https://cdn.www.sojson.com/file/16-09-13-17-31-50/doc/7536067852">
+<meta property="og:image" content="https://cdn.www.sojson.com/file/16-09-13-17-38-23/doc/6157769375">
+<meta property="og:image" content="https://cdn.www.sojson.com/file/16-09-13-17-40-31/doc/9643910892">
+<meta property="og:image" content="https://cdn.www.sojson.com/file/16-09-13-17-41-13/doc/4277078151">
+<meta property="og:image" content="https://cdn.www.sojson.com/file/16-09-13-17-41-46/doc/7517428031">
+<meta property="og:image" content="https://cdn.www.sojson.com/file/16-09-13-17-42-10/doc/0470793701">
+<meta property="og:image" content="https://cdn.www.sojson.com/file/16-09-13-17-43-45/doc/6119062079">
+<meta property="og:image" content="https://cdn.www.sojson.com/file/16-09-13-17-44-37/doc/5862986692">
+<meta property="og:image" content="https://cdn.www.sojson.com/file/16-09-13-17-44-54/doc/3912022068">
+<meta property="og:image" content="https://cdn.www.sojson.com/file/16-09-13-17-45-16/doc/5079389763">
+<meta property="og:updated_time" content="2019-04-28T07:38:07.344Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="使用Elasticsearch构建电商搜索平台实践案例[转]">
+<meta name="twitter:description" content="##背景 随着互联网数据规模的爆炸式增长，如何从海量的历史，实时数据中快速获取有用的信息，变得越来越有挑战性。 电商数据系统主要类型一个中等的电商平台，每天都要产生百万条原始数据，上亿条用户行为数据。一般来说，电商数据一般有3种主要类型的数据系统：  关系型数据库 ，大多数互联网公司会选用mysql作为关数据库的主选，用于存储商品，用户信息等数据。 关系型数据库对于事务性非常高的OLTP操作(比如">
+<meta name="twitter:image" content="https://cdn.www.sojson.com/file/16-09-13-17-20-00/doc/4155822960">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://calfgz.github.io/blog/2018/07/elasticsearch-e-commerce.html">
+
+
+
+
+
+  <title>使用Elasticsearch构建电商搜索平台实践案例[转] | 牛犊记</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?eb8a0170f0ad9db33295cfbe2dc5b699";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">牛犊记</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://calfgz.github.io/blog/2018/07/elasticsearch-e-commerce.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="calfgz">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="牛犊记">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">使用Elasticsearch构建电商搜索平台实践案例[转]</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-07-05T11:01:12+08:00">
+                2018-07-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/ElasticSearch/" itemprop="url" rel="index">
+                    <span itemprop="name">ElasticSearch</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>##背景</p>
+<p>随着互联网数据规模的爆炸式增长，如何从海量的历史，实时数据中快速获取有用的信息，变得越来越有挑战性。</p>
+<h2><span id="电商数据系统主要类型">电商数据系统主要类型</span></h2><p>一个中等的电商平台，每天都要产生百万条原始数据，上亿条用户行为数据。一般来说，电商数据一般有3种主要类型的数据系统：</p>
+<ul>
+<li>关系型数据库 ，大多数互联网公司会选用mysql作为关数据库的主选，用于存储商品，用户信息等数据。 关系型数据库对于事务性非常高的OLTP操作(比如订单，结算等)支持良好。</li>
+<li>hadoop生态 ，hadoop是数据仓库主要的载体，除了备份关系型数据库的所有版本，还存储用户行为，点击，曝光，互动等海量日志数据，hadoop对于数据分析，数据挖掘等OLAP支持比关系型数据库更加具有扩展性和稳定性。</li>
+<li>搜索引擎 ，以elasticsearch和solr为代表。搜索引擎是获取信息最高效的途径，几乎成为各类网站，应用的基础标配设施(地位仅次于数据库)。</li>
+</ul>
+<p>目前搜索引擎技术已经有非常成熟的开源解决方案，最出名的ElasticSearch和Solr都是基于lucence的。很多中小型互联网公司搜索引擎都是基于这两个开源系统搭建的，但是即便如此，一个搜索引擎团队想把搜索引擎质量做到商用标准，从系统熟悉，服务搭建，功能定制，通常需要花费较长时间。</p>
+<p>通用搜索引擎应用在互联网商用搜索 通常会遇到如下几个问题 ：</p>
+<ul>
+<li>搜索引擎与公司现有数据系统的集成。mysql 和 hadoop是电商的两个主要数据载体，搜索引擎在全量和增量建索引过程中必须和mysql或hadoop无缝集成，才能发挥搜索引擎自身的实时性，水平扩展性(性能与容量和机器数量成正比)等优势。</li>
+<li>商用搜索高度定制化与通用搜索引擎的矛盾。商用搜索的问题有时候超越了搜索引擎本身解决的范围，比如商品的去重，店铺的去重需要很专业的搜索引擎使用技巧; 商品的权重，用户意图的识别需要算法和模型的支持。</li>
+<li>在不了解搜索引擎专业知识的前提下，很难创建对性能友好的索引。结果造成了通用搜索性能很差的假象。</li>
+</ul>
+<p>笔者是有赞大数据架构师，从自身的搜索实践出发，分享搜索引擎实际的架构和解决的问题。</p>
+<h2><span id="搜索引擎架构">搜索引擎架构</span></h2><p>有赞搜索引擎实践，上半部分主要介绍搜索引擎的架构和性能优化方面的经验；下半部分是算法篇，介绍有赞实际需要的搜索算法的问题和解决方案。文章仅仅介绍一个中型电商公司实际的使用现状和笔者个人的经验，不代表搜索引擎最佳实践方法，也不代表可以适用所有的场景。</p>
+<h3><span id="技术架构">技术架构</span></h3><p>有赞搜索引擎基于分布式实时引擎elasticsearch(ES)。ES构建在开源社区最稳定成熟的索引库lucence上，支持多用户租用，高可用，可水平扩展；并有自动容错和自动伸缩的机制。我们同事还实现了es与mysql和hadoop的无缝集成；我们自主开发了高级搜索模块提供灵活的相关性计算框架等功能。</p>
+<p><img src="https://cdn.www.sojson.com/file/16-09-13-17-20-00/doc/4155822960" alt="架构图"></p>
+<h3><span id="索引构建">索引构建</span></h3><p>互联网索引的特点是实时性高，数据量大。时效性要求用户和客户的各种行为能够第一时间进入索引；数据量大要求一个有效分布式方案可以在常数时间内创建不断增长的TB数量级索引。</p>
+<p>实时索引我们采用 面向队列的架构 ，数据首先写入DB(或文件)，然后通过数据库同步机制将数据流写入kafka队列。这种同步机制和数据库主从同步的原理相同，主要的开源产品有mypipe和阿里推出的canal。es通过订阅相应的topic实现实时建立索引。</p>
+<p>如果数据源是文件，则使用flume实时写入Kafka。</p>
+<p>另外一个索引问题是全量索引。有如下几个场景让 全量索引是一个必要过程 ：</p>
+<ul>
+<li>实时更新有可能会丢数据，每次很少的丢失时间长了降低搜索引擎的质量。 周期性的全量更新是解决这个问题的最直接的方法；</li>
+<li>即使能够保证实时更新，业务的发展有可能有重新建索引的需求(比如增加字段，修改属性，修改分词算法等)。</li>
+<li>很多搜索引擎是在业务开始后很久才搭建的，冷启动必须全量创建索引。</li>
+</ul>
+<p>我们采用 Hadoop-es 利用hadoop分布式的特性来创建索引。hadoop-es让分布式索引对用户透明，就像单机更新索引一样。一个是分布式的数据平台，一个是分布式搜索引擎，如果能把这两个结合就能够实现分布式的全量索引过程。Hadoop-es正式我们想要的工具。</p>
+<p><img src="https://cdn.www.sojson.com/file/16-09-13-17-22-07/doc/8749385194" alt="Hadoop-es"></p>
+<p>我们给出一个通过Hive sql创建索引的栗子 ：<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">drop</span> <span class="keyword">table</span> search.goods_index;</span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">EXTERNAL</span> <span class="keyword">TABLE</span> search.goods_index (</span><br><span class="line">is_virtual <span class="built_in">int</span>,</span><br><span class="line">created_time <span class="keyword">string</span>,</span><br><span class="line">update_time <span class="keyword">string</span>,</span><br><span class="line">title <span class="keyword">string</span>,</span><br><span class="line">tag_ids <span class="built_in">array</span></span><br><span class="line">) <span class="keyword">STORED</span> <span class="keyword">BY</span> ‘org.elasticsearch.hadoop.hive.EsStorageHandler’ TBLPROPERTIES (</span><br><span class="line">‘es.batch.size.bytes’=’<span class="number">1</span>mb’,</span><br><span class="line">‘es.batch.size.entries’=’<span class="number">0</span>’,</span><br><span class="line">‘es.batch.write.refresh’=’<span class="literal">false</span>’,</span><br><span class="line">‘es.batch.write.retry.count’=’<span class="number">3</span>’,</span><br><span class="line">‘es.mapping.id’=’<span class="keyword">id</span>’,</span><br><span class="line">‘es.write.operation’=’<span class="keyword">index</span>’,</span><br><span class="line">‘es.nodes’=’<span class="number">192.168</span><span class="number">.1</span><span class="number">.10</span>:<span class="number">9200</span>’,</span><br><span class="line">‘es.resource’=’goods/goods’);</span><br></pre></td></tr></table></figure></p>
+<p>系统把es映射成hive的一个外部表，更新索引就像是写入一个hive表一样。实际上所有分布式问题都被系统透明了。</p>
+<p>不建议从数据库或文件系统来全量索引。一方面这会对业务系统造成很大的压力，另一方面因为数据库和文件系统都不是真正分布式系统，自己写程序保证全量索引的水平扩展性很容易出问题，也没有必要这么做。</p>
+<p>全量索引和增量索引的架构如下图所示。另外一点是hadoop也是订阅kafka备份数据库和日志的。我个人建议一个公司所有DB和文件都存储在hadoop上，这样做起码有二个 好处 ：</p>
+<ul>
+<li>hadoop上使用hive或者spark创建的数据仓库为大数据提供统一的操作接口。</li>
+<li>hadoop数据相对于线上更加稳定，可以作为数据恢复的最后一个防线。</li>
+</ul>
+<p>数据仓库的话题不在本篇文章的讨论范围，这里只是简单提一下。</p>
+<p><img src="https://cdn.www.sojson.com/file/16-09-13-17-23-48/doc/6444274439" alt="索引架构"></p>
+<h4><span id="为什么我们选择kafka">为什么我们选择Kafka？</span></h4><p>Kafka 是一个以高吞吐著名的消息系统。Kafka开启了日志合并(log compaction)功能后，可以永久保存每条消息。每一条消息都有一个key，正好对应数据库的主键，Kafka始终保存一个key最新的一条消息，历史版本会被垃圾回收掉。有了这个特性，Kafka不仅可以保存数据库最新的快照，而且可以实现实时更新的消息系统。</p>
+<p>第一次同步的时候，数据表中每行记录都转化成以主键为key的消息进入Kafka，并且可以被任意数量的broker消费。之后数据库的每次更新(insert，updated，delete)都会被转化成Kafka的消息。如果一行记录频繁被更改，Kafka会识别这些重复的消息，把旧的消息回收掉。</p>
+<p>Kafka既保存数据库最新的全量数据，又提供实时数据流的这个特性为架构的可维护性提供极大便捷。如果你想从零扫描整个数据库，你只需要从开始消费这个Kafka的topic即可完成，当读到topic末端，自动获得实时更新的特性。</p>
+<p>Kakfa的另一个特性是 支持从任意断点读取数据 ，比如我们全量索引是从HDFS中读取，我们可以根据HDFS保存的数据的最后一条的时间戳，直接切换到Kafka读取之后的数据。</p>
+<h3><span id="高级搜索-超越es功能限制">高级搜索： 超越ES功能限制</span></h3><p>高级搜索模块(AS)在商业搜索引擎起到至关重要的作用。在各大商业搜索引擎公司里面AS已经成为标配，也是变更最为频繁的模块。</p>
+<p>AS在商业搜索引擎中主要起到如下作用：</p>
+<ul>
+<li>反向代理，实现基于分片的分布式搜索(实际上es有这个功能); 提供必要的容灾支持</li>
+<li>提供插件化的相关性计算框架</li>
+<li>提供丰富的相关性库，比如query分析库，query改写库，排序库，过滤库等。</li>
+<li>管理不同的搜索业务</li>
+</ul>
+<p><img src="https://cdn.www.sojson.com/file/16-09-13-17-26-48/doc/1686251170" alt="AS"></p>
+<p>AS 一个主要的功 能 是通过一个个业务插件来代表相应的搜索。一个最简单的插件只需要包含对应的ES search API，它实际上就是一个配置项，说明es的地址。 这样AS就是一个纯代理。但是商业搜索的需求都是不是ES本身能够支持的，所以就需要根据需求写相应的Query rewriter，rerank等算法插件。这样就实现了框架和业务分离，AS具有极强的扩展性和复用性。</p>
+<p>AS 另一个功能 是提供通用算法库，实际上它只为每种算法提供编程框架。 算法也是通过插件的方式加入算法库的。这种方法可以让算法工程师抽象公共算法库供业务方使用，避免重新造轮子。一个具体业务要么使用已经存在的算法(并修改参数)，要么自己实现算法。</p>
+<p><img src="https://cdn.www.sojson.com/file/16-09-13-17-29-33/doc/4071445009" alt="AS算法"></p>
+<p>上图是一个 实例 。商品搜索和分销搜索各自实现一个rerank的的算法，同时都调用了系统提供的rerank1的算法库，并加入了自己特有的逻辑。</p>
+<p>AS除了基本proxy功能外，还提供基于query的cache功能用于应用级别的缓存。内部有一个缓冲队列，防止出现雪崩现象。下一节性能优化中会详细说明。</p>
+<h3><span id="es性能优化">ES性能优化</span></h3><p>下面几个小结，我们写了几个我们遇到的性能优化场景。</p>
+<h4><span id="使用应用级队列防止雪崩">使用应用级队列防止雪崩</span></h4><p>ES一个问题是在高峰期时候极容易发生雪崩。ES有健全的线程池系统来保证并发与稳定性问题。 但是在流量突变的情况下(比如双十一秒杀)还是很容易发生瘫痪的现象，主要的原因如下：</p>
+<ul>
+<li>ES几乎为每类操作配置一个线程池; 只能保证每个线程池的资源使用时合理的，当2个以上的线程池竞争资源时容易造成资源响应不过来。</li>
+<li>ES没有考虑网络负载导致稳定的问题。</li>
+</ul>
+<p>在AS里我们实现了面向请求的全局队列来保证稳定性。 它主要做了3件事情。</p>
+<p><img src="https://cdn.www.sojson.com/file/16-09-13-17-31-50/doc/7536067852" alt></p>
+<ul>
+<li>根据业务把请求分成一个个slide，每个slide对应一个队列。 默认一个应用就是一个slide，一个应用也可以区分不同的slide，这样可以保护一个应用内重要的查询。</li>
+<li>每个队列配置一个队列长度，默认为50。</li>
+<li>每个队列计算这个队列的平均响应时间。 当队列平均响应时间超过200ms，停止工作1s，如果请求溢出就写入溢出日志留数据恢复使用。 如果连续10次队列平均响应时间超过500ms就报警，以便工程师第一时间处理。</li>
+</ul>
+<h4><span id="自动降级">自动降级</span></h4><p>应用级队列解决雪崩问题有点粗暴，如果一个应用本身查询就非常慢，很容易让一个应用持续超时很久。我们根据搜索引擎的特点编写了自动降级功能。</p>
+<p>比如商品搜索的例子，商品搜索最基本的功能是布尔查询，但是还需要按照相关性分数和质量度排序等功能，甚至还有个性化需求。完成简单的布尔查询，ES使用bitsets操作就可以做到，但是如果如果需要相关性分，就必须使用倒排索引，并有大量CPU消耗来计算分数。ES的bitsets比倒排索引快50倍左右。</p>
+<p>对于有降级方案的slide，AS在队列响应过慢时候直接使用降级query代替正常query。这种方法让我们在不扩容的情况下成功度过了双十一的流量陡增。</p>
+<h4><span id="善用filtered-query">善用filtered query</span></h4><p>理解lucence filter工作原理对于写出高性能查询语句至关重要。许多搜索性能优化都和filter的使用有关。filter使用bitsets进行布尔运算，quey使用倒排索引进行计算，这是filter比query快的原因。 bitsets的优势 主要体现在：</p>
+<ul>
+<li>bitsetcache在内存里面，永不消失(除非被LRU)。</li>
+<li>bitsets利用CPU原生支持的位运算操作，比倒排索引快个数量级</li>
+<li>多个bitsets的与运算也是非常的快(一个64位CPU可以同时计算64个DOC的与运算)</li>
+<li>bitsets 在内存的存储是独立于query的，有很强的复用性</li>
+<li>如果一个bitset片段全是0，计算会自动跳过这些片段，让bitsets在数据稀疏情况下同样表现优于倒排索引。</li>
+</ul>
+<p>举个例子：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">query:bool:  </span><br><span class="line">    tag:&apos;mac&apos;</span><br><span class="line">    region:&apos;beijing&apos;</span><br><span class="line">    title: &quot;apple&quot;</span><br></pre></td></tr></table></figure></p>
+<p>lucence处理这个query的方式是在倒排索引中寻找这三个term的倒排链，并使用跳指针技术求交，在运算过程中需要对每个doc进行算分。实际上tag和region对于算分并没有作用，他们充当是过滤器的作用。</p>
+<p>这就是过滤器使用场景，它只存储存在和不存在两种状态。 如果我们把tag和region使用bitsets进行存储，这样这两个过滤器可以一直都被缓存在内存里面，这样会快很多。 另外tag和region之间的求交非常迅速，因为64位机器可以时间一个CPU周期同时处理64个doc的位运算。</p>
+<p>一个lucence金科玉律是： 能用filter就用filter，除非必须使用query(当且仅当你需要算分的时候)。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">query:  </span><br><span class="line">    filtered: </span><br><span class="line">        query:  </span><br><span class="line">             title: &quot;apple&quot; </span><br><span class="line">         filter:</span><br><span class="line">            tag:&quot;mac&quot;</span><br><span class="line">             region:&quot;beijing&quot;</span><br></pre></td></tr></table></figure>
+<p>lucence的filtered query会智能的先计算filter语句，然后才计算query语句，尽可能在进行复杂的倒排算法前减少计算空间。</p>
+<h4><span id="其他性能优化">其他性能优化</span></h4><p>线上集群关闭分片自动均衡。分片的自动均衡主要目的防止更新造成各个分片数据分布不均匀。但是如果线上一个节点挂掉后，很容易触发自动均衡，一时间集群内部的数据移动占用所有带宽。建议采用闲时定时均衡策略来保证数据的均匀。</p>
+<p>尽可能延长refresh时间间隔。为了确保实时索引es索引刷新时间间隔默认为1秒，索引刷新会导致查询性能受影响，在确保业务时效性保证的基础上可以适当延长refresh时间间隔保证查询的性能。</p>
+<p>除非有必要把all字段去掉。索引默认除了索引每个字段外，还有额外创建一个all的字段，保存所有文本，去掉这个字段可以把索引大小降低50%。</p>
+<p>创建索引时候，尽可能把查询比较 慢 的索引和 快 的 索引物理分离 。</p>
+<p>本文对es本身的优化写的不多，因为es官网和其他的博客有很多es优化的意见，就不在一一枚举。本文的主要目的是能够对搭建商用电商搜索引擎给读者一个一般性的建议，另外，困扰商用搜索引擎的最常见的问题是排序和算法问题。</p>
+<h2><span id="算法体系架构">算法体系架构</span></h2><p>在上半部分中，我们介绍了有赞搜索引擎的基本框架。搜索引擎主要3个部件构成。第一，hadoop集群，用于生成大规模搜索和实时索引； 第二，ElasticSearch集群，提供分布式搜索方案； 第三，高级搜索集群，用于提供商业搜索的特殊功能。</p>
+<h3><span id="索引过程">索引过程</span></h3><p>创建索引过程从原始数据创建倒排索引的过程。这个过程中我们对商品(doc)进行分析，计算商品静态分，并对商品进行相似度计算。商品的静态分对于提升搜索引擎质量起到至关重要的作用，相当于网页搜索的pagerank，想象一下如果没有pagerank算法，网页搜索的质量会有多么差。在电商搜索中，最常见的问题是相似商品太多，必须在建立索引过程中就对商品间的相似度进行预计算，以便在检索过程中进行有效去重。</p>
+<p>创建索引的过程如下：</p>
+<ul>
+<li>step 1，计算每个doc的静态分；</li>
+<li>step 2，计算两两doc的相似度；</li>
+<li>step 3，根据相似度和其他信息对数据进行分库；</li>
+<li>step 4，建立ES索引。</li>
+</ul>
+<h4><span id="检索过程">检索过程</span></h4><p>检索过程是搜索引擎接收用户的query进行一系列处理并返回相关结果的过程。商业搜索引擎在检索过程中需要考虑2个因素：1) 相关性，2) 重要性。</p>
+<p>相关性是指返回结果和输入query是否相关，这是搜索引擎基本问题之一，目前常用的算法有BM25和空间向量模型。这个两个算法ElasticSearch都支持，一般商业搜索引擎都用BM25算法。BM25算法会计算每个doc和query的相关性分，我们使用Dscore表示。</p>
+<p>重要性是指商品被信赖的程度，我们应该吧最被消费之信赖的商品返回给消费者，而不是让消费之自己鉴别。尤其是在商品充分竞争的电商搜索，我们必须赋予商品合理的重要性分数，才能保证搜索结果的优质。重要性分，又叫做静态分，使用Tscore表示。</p>
+<p>搜索引擎最终的排序依据是：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Score = Dscore * Tscore</span><br></pre></td></tr></table></figure></p>
+<p>即综合考虑静态分和动态分，给用户相关且重要的商品。</p>
+<p>检索的过程大致抽象为如下几个步骤。</p>
+<ul>
+<li>step 1，对原始query进行query分析；</li>
+<li>step 2，在as中根据query分析结果进行query重写；</li>
+<li>step 3，在as中使用重写后的query检索es；</li>
+<li>step 4，在es查询过程中根据静态分和动态分综合排序；</li>
+<li>step 5，在as中吧es返回的结果进行重排；</li>
+<li>step 6，返回结果。</li>
+</ul>
+<p><img src="https://cdn.www.sojson.com/file/16-09-13-17-38-23/doc/6157769375" alt></p>
+<h3><span id="商品静态分计算技术">商品静态分计算技术</span></h3><p>在电商搜索引擎里面商品的静态分是有网页搜索里面的pagerank同等的价值和重要性，他们都是doc固有的和查询query无关的价值度量。pagerank通过doc之间的投票关系进行运算，相对而言商品的静态分的因素会更多一些。商品静态计算过程和pagerank一样 需要解决如下2个问题 ：</p>
+<ul>
+<li>稳定性 。pagerank可以保证一个网站不会因为简单链接堆砌可以线性提升网站的排名。同样，商品静态分的计算不可以让商品可以通过增加单一指标线性增加分值(比如刷单对搜索引擎的质量的影响)。</li>
+<li>区分度 。在保证稳定性的基础上商品静态分要有足够的区分度可以保证同样搜索的条件下，排在前面的商品的质量比排在后面的商品的质量高。</li>
+</ul>
+<p>我们假设商品的静态分有3个决定性因素：1，下单数；2，好评率；3，发货速度。</p>
+<p>静态分我们使用Tsocre表示，Tscore可以写成如下形式:<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Tscore = a * f(下单数) + b * g(好评率) + c * h(发货速度)</span><br></pre></td></tr></table></figure></p>
+<p>a，b，c是权重参数，用于平衡各个指标的影响程度。f，g，h是代表函数用于把原始的指标转化成合理的度量。</p>
+<p>首先，我们需要寻找合理的代表函数。</p>
+<ul>
+<li>首先对各个指标取log。log的导数是一个减函数，表示为了获得更好的分数需要花费越来越多的代价。</li>
+<li>标准化。标准化的目的让各个度量可以在同一区间内进行比较。比如下单数的取值是0~10000，而好评率的取值为0~1。这种情况会影响到数据分析的结果和方便性，为了消除指标之间的量纲的影响，需要进行数据标准化处理，以解决数据指标之间的可比性。最常用的标准化方法是z-score标准化方法。</li>
+</ul>
+<h4><span id="z-score-标准化方法">z-score 标准化方法</span></h4><p>“概率论”告诉我们对于满足正态分布的数据来说，均值前后3个z-score的范围可以覆盖99%的数据。经验地，我们把&gt;5个zscore 或者小于 -5个zscore的分数设置成5*zscore或者-5zscore。特别说明的是，我们不建议使用min-max标准化方法。这种方法又叫离差标准化，是对原始数据的线性变换，使结果值映射到[0-1]之间，转化函数如下：</p>
+<p><img src="https://cdn.www.sojson.com/file/16-09-13-17-40-31/doc/9643910892" alt></p>
+<p>这种方法非常不稳定，假设一个奇异点是第二大的值的1000倍，会让大部分的值都集中在0~0.01，同样失去了归一化的目的。</p>
+<p>图一是使用min-max归一化后的数据分布，显然大部分数据被”压扁”在很小的范围； 图二使用log归一化后的数据分布，由于log缓解了增长速度，可以看出来已经有一个不错的结果了；图三是在log的基础上进行z-score归一化，可以看出来，z-score让数据变得非常平滑。</p>
+<p><img src="https://cdn.www.sojson.com/file/16-09-13-17-41-13/doc/4277078151" alt="图一: min-max归一化"></p>
+<p><img src="https://cdn.www.sojson.com/file/16-09-13-17-41-46/doc/7517428031" alt="图二: log归一化"></p>
+<p><img src="https://cdn.www.sojson.com/file/16-09-13-17-42-10/doc/0470793701" alt="图三: log-zscore归一化"></p>
+<p>最后，选择合适的权重 经过log-zscore归一化以后，我们基本上吧f，g，h的表示的代表函数说明清楚。Tscore = af(下单数) + bg(好评率) + c*h(发货速度)，下一步就是确定a，b，c的参数。一般有两个方法：</p>
+<ul>
+<li>专家法。根据我们的日常经验动态调整权重参数；</li>
+<li>实验法。首先在专家的帮助下赋一个初始值，然后改变单一变量的方法根据abtest的结果来动态调整参数。</li>
+</ul>
+<h3><span id="商品标题去重">商品标题去重</span></h3><p>商品标题去重在电商搜索中起到重要作用，根据数据，用户通过搜索页购买商品80%选择搜索的前4页。商品标题的重复会导致重要的页面没有含金量，极大降低了搜索的购买率。</p>
+<p>举个例子:</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Title1:美味/香蕉/包邮/广东/高州/香蕉/banana<span class="comment">//无/催熟剂/</span></span><br><span class="line">Title2:美味/香蕉/广东/高州/香蕉<span class="comment">//非/粉蕉/包邮/</span></span><br></pre></td></tr></table></figure>
+<p>这里用到 “bag of word” 技术，将词汇表作为空间向量的维度，标题的每个term的词频作为这个feature的值。以这个例子来说。这个词汇的维度为: 美味(0)，香蕉(1)，包邮(2)，广东(3)，高州(4)，banana(5)，无(6)，催熟剂(7)，非(8)，粉蕉(9) 位置: 0，1，2，3，4，5，6，7，8，9</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Title1: <span class="number">1</span>，<span class="number">2</span>，<span class="number">1</span>，<span class="number">1</span>，<span class="number">1</span>，<span class="number">1</span>，<span class="number">1</span>，<span class="number">1</span>，<span class="number">0</span>，<span class="number">0</span></span><br><span class="line">Title2: <span class="number">1</span>，<span class="number">2</span>，<span class="number">1</span>，<span class="number">1</span>，<span class="number">1</span>，<span class="number">0</span>，<span class="number">0</span>，<span class="number">0</span>，<span class="number">1</span>，<span class="number">1</span></span><br></pre></td></tr></table></figure>
+<p>这个每个title都用一个固定长度的向量表示。</p>
+<p>再次，计算两两相似度。</p>
+<p>相似度一般是通过计算两个向量的距离实现的，不失一般性，在这里我们使用1-cosine(x，y)来表示两个向量的距离。这是一个”All Pair Similarity”的问题，即需要两两比较，复杂度在O(n^2)。在商品量巨大的时候单机很难处理。我们给出两种方法用于实现”All Pair Similarity”。</p>
+<p>方法一：spark的矩阵运算。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">rddRows = sc.parallelize([“1 0 2 0 0 1”, “0 0 4 2 0 0″])</span><br><span class="line">rddRows.map(lambda x: Vectors.dense([float(each) for each in str(x).split(” “)]))</span><br><span class="line">mat = RowMatrix(rddRows)</span><br><span class="line">simsPerfect = mat.columnSimilarities()</span><br></pre></td></tr></table></figure></p>
+<p>方法二：map-reduce 线性方法。</p>
+<p>这个方法参考论文”Pairwise Document Similarity in Large Collections with MapReduce”。可以实现几乎线性的时间复杂度。相对于矩阵运算在大规模(10亿以上)pair similarity 运算上面有优势。这个方法简单的描述如下: 首先，按照倒排索引的计算方式计算每个term到doc的映射。比如3个doc：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">doc1 = 我 爱 北京</span><br><span class="line">doc2 = 我 北京 天安门</span><br><span class="line">doc3 = 我 天安门</span><br></pre></td></tr></table></figure>
+<p>转化为倒排格式，这个需要一次mapper reduce</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">我     -&gt; doc1, doc2, doc3</span><br><span class="line">爱     -&gt; doc1</span><br><span class="line">北京   -&gt; doc1, doc2</span><br><span class="line">天安门 -&gt; doc2, doc3</span><br></pre></td></tr></table></figure>
+<p>然后，对于value只有一个元素的过滤掉，对于value大于2个doc的两两组合:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">doc1,doc2 &lt;—- from: 我     -&gt; doc1, doc2, doc3</span><br><span class="line">doc1,doc3 &lt;—- from: 我     -&gt; doc1, doc2, doc3</span><br><span class="line">doc2,doc3 &lt;—- form: 我     -&gt; doc1, doc2, doc3</span><br><span class="line">doc1,doc2 &lt;—- from: 北京   -&gt; doc1, doc2</span><br><span class="line">doc2,doc3 &lt;—- from: 天安门 -&gt; doc2, doc3</span><br></pre></td></tr></table></figure>
+<p>最后，对于输出进行聚合，value为重复次数和两个doc乘积开根号的比。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">doc1,doc2 -&gt; 2/(len(doc1)*len(doc2))^1/2 = 0.7</span><br><span class="line">doc1,doc3 -&gt; 1/(len(doc1)*len(doc3))^1/2 = 0.3</span><br><span class="line">doc2,doc3 -&gt; 2/(len(doc2)*len(doc3))^1/2 = 0.3</span><br></pre></td></tr></table></figure>
+<p>对于2个title1，title2，如果X(title1，title2) &gt; 0.7 则认为title1和title2相似，对于相似的两个doc，静态分大的定义为主doc，静态分小的定义为辅doc。主doc和辅doc分别建库。</p>
+<p><img src="https://cdn.www.sojson.com/file/16-09-13-17-43-45/doc/6119062079" alt></p>
+<p>区别于网页搜索(网页搜索直接将辅doc删除)，我们将主doc和辅doc分别建库。每一次搜索按比例分别搜主库和辅库，并将结果融合返回。这样可以保证结果的多样性。</p>
+<h3><span id="店铺去重">店铺去重</span></h3><p>店铺去重和商品标题去重有点不同。由于电商特定场景的需要，不希望搜索结果一家独大，这样会引发强烈的马太效应。店铺去重不能使用如上的方法进行。因为上面的方法的主要依据是文本相似，在结果都相关的前提下，进行适当的取舍。但是店铺去重不是这样的特性。</p>
+<p>设想一下，如果我们根据店铺是否相同，把同一店铺的商品分到主库和从库中，如下图所示。</p>
+<p><img src="https://cdn.www.sojson.com/file/16-09-13-17-44-37/doc/5862986692" alt></p>
+<p>A和B代表不同的店铺。</p>
+<p>在搜索香蕉的时候，的确可以控制A店铺结果的数量，但是在搜索”梨”的时候就错误的吧B店铺的梨排在前面了(假设A：梨比B：梨静态分高)。</p>
+<p>实际上想达到店铺去重的效果通过分桶搜索是很容易做的事情。我们假设每页搜索20个结果，我们把索引库分成4个桶，每个商品对桶数取模得到所在桶的编号。这样可以保证同一店铺的商品仅在一个桶里面。搜索的过程每个桶平均分摊搜索任务的25%，并根据静态分合并成一页的结果。这样同一保证结果的相对顺序，又达到了店铺去重的目的。</p>
+<p><img src="https://cdn.www.sojson.com/file/16-09-13-17-44-54/doc/3912022068" alt></p>
+<p>如上图所示，搜索”香蕉”，虽然A店铺有10个满足需求的结果，但是每页搜索醉倒只有5个结果可以展示。</p>
+<h4><span id="query分析与query改写技术">query分析与Query改写技术</span></h4><p>上面介绍了几个建立索引过程中几项技术，检索过程中的关键技术有很多。其中最著名的是query分析技术。我们使用的query分析技术主要包括核心词识别，同义词拓展，品牌词识别等等。query分析技术大部分都是NLP研究范围，本文就不详细阐述很多理论知识。我们重点介绍同义词拓展技术。这个技术一般都需要根据自己的商品和和用户日志特定训练，无法像分词技术和品牌词识别一样有标准的库可以适用。</p>
+<p>同义词拓展一般是通过分析用户session日志获取。如果一个用户输入”苹果手机”没有得到想要的结果，他接着输入”iphone”，我们在”苹果手机”和”iphone”之间创建一个转移关系。基于统计，我们可以把用户query创建一个相互联系的权重图。</p>
+<p><img src="https://cdn.www.sojson.com/file/16-09-13-17-45-16/doc/5079389763" alt></p>
+<p>用户输入query “苹果手机”，根据query分析，”苹果手机”有 “iphone”0.8，”iphone 6″0.5 两个同义词。0.8和0.5分别表示同义的程度。我们想要”苹果手机”，”iphone”，”iphone 6” 3个query同时输入，并且按照同义的程度对不同的query赋予不同的权重。ElasticSearch提供的BoostingQuery可以支持这个需求。</p>
+<p>原始的query：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    “query”&#123;</span><br><span class="line">        “match”: &#123;</span><br><span class="line">            “query”: ”苹果手机”</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>优化后的query：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    &quot;query&quot;: &#123;</span><br><span class="line">        &quot;should&quot;: [</span><br><span class="line">            &#123;</span><br><span class="line">                &quot;match&quot;: &#123;</span><br><span class="line">                    &quot;content&quot;: &#123;</span><br><span class="line">                        &quot;query&quot;: &quot;苹果手机&quot;,</span><br><span class="line">                        &quot;boost&quot;: 10</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;,</span><br><span class="line">            &#123;</span><br><span class="line">                &quot;match&quot;: &#123;</span><br><span class="line">                    &quot;content&quot;: &#123;</span><br><span class="line">                        &quot;query&quot;: &quot;iphone&quot;,</span><br><span class="line">                        &quot;boost&quot;: 8</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;,</span><br><span class="line">            &#123;</span><br><span class="line">                &quot;match&quot;: &#123;</span><br><span class="line">                    &quot;content&quot;: &#123;</span><br><span class="line">                        &quot;query&quot;: &quot;iphone6&quot;,</span><br><span class="line">                        &quot;boost&quot;: 5</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        ]</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>其他比如核心词识别，歧义词纠正等方法差不多，本文不做详细阐述。</p>
+<h3><span id="小结">小结</span></h3><p>商业电商搜索算法另外两个重要技术，一个是类目体系建立和应用，另一个是个性化技术。这个两项技术我们还处在探索阶段。类目体系我们主要使用机器学习的方法进行训练，个性化主要通过用户画像进行Query改写来实现。等我们上线有效果在与大家分享。</p>
+<p>搜索算法是一个非常值得一个电商产品持续投入的技术。一方面如果技术人员要有良好的技术背景，可以借鉴很多成熟的技术，避免重复造轮子； 另一方面，每个产品的搜索都有自身的特点，需要深入研究产品的特性给出合理的解决方案。</p>
+<p>本文给出的案例都具有代表性，灵活的运用搜索的各方面的技术。另外，商业搜索非常看重投入产出比，我们也需要在众多方案中寻找捷径。比如我们在做类目体系时候，没有投入大量的人力资源用于标注数据，而是通过爬虫爬取其他电商的数据进行参考，从而节省了80%的人力资源。由于笔者能力有限，文中的方案不保证是问题的最优解，如果有指正，请联系笔者(<a href="mailto:hongbin@youzan.com" target="_blank" rel="noopener">hongbin@youzan.com</a>)。</p>
+<p>转载: <a href="https://mp.weixin.qq.com/s?__biz=MzU1NDA4NjU2MA==&amp;mid=2247486428&amp;idx=1&amp;sn=f77bcbf0441df57a919e37688ac2d088&amp;source=41#wechat_redirect" target="_blank" rel="noopener">AI前线 </a></p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/ElasticSearch/" rel="tag"># ElasticSearch</a>
+          
+            <a href="/tags/电商/" rel="tag"># 电商</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/blog/2018/05/http-redirect-java-node.html" rel="next" title="用Java和Nodejs获取http30X跳转后的url">
+                <i class="fa fa-chevron-left"></i> 用Java和Nodejs获取http30X跳转后的url
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/blog/2018/07/elasticsearch-suggest.html" rel="prev" title="ElasticSearch实战应用建议">
+                ElasticSearch实战应用建议 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image" src="/images/avatar.gif" alt="calfgz">
+          <p class="site-author-name" itemprop="name">calfgz</p>
+           
+              <p class="site-description motion-element" itemprop="description">Draw my work with code</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">29</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">9</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">31</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/calfgz" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#undefined"><span class="nav-number">1.</span> <span class="nav-text">电商数据系统主要类型</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#undefined"><span class="nav-number">2.</span> <span class="nav-text">搜索引擎架构</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#undefined"><span class="nav-number">2.1.</span> <span class="nav-text">技术架构</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#undefined"><span class="nav-number">2.2.</span> <span class="nav-text">索引构建</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">2.2.1.</span> <span class="nav-text">为什么我们选择Kafka？</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#undefined"><span class="nav-number">2.3.</span> <span class="nav-text">高级搜索： 超越ES功能限制</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#undefined"><span class="nav-number">2.4.</span> <span class="nav-text">ES性能优化</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">2.4.1.</span> <span class="nav-text">使用应用级队列防止雪崩</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">2.4.2.</span> <span class="nav-text">自动降级</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">2.4.3.</span> <span class="nav-text">善用filtered query</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">2.4.4.</span> <span class="nav-text">其他性能优化</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#undefined"><span class="nav-number">3.</span> <span class="nav-text">算法体系架构</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#undefined"><span class="nav-number">3.1.</span> <span class="nav-text">索引过程</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">3.1.1.</span> <span class="nav-text">检索过程</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#undefined"><span class="nav-number">3.2.</span> <span class="nav-text">商品静态分计算技术</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">3.2.1.</span> <span class="nav-text">z-score 标准化方法</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#undefined"><span class="nav-number">3.3.</span> <span class="nav-text">商品标题去重</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#undefined"><span class="nav-number">3.4.</span> <span class="nav-text">店铺去重</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">3.4.1.</span> <span class="nav-text">query分析与Query改写技术</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#undefined"><span class="nav-number">3.5.</span> <span class="nav-text">小结</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy;  2017 - 
+  <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">calfgz</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
