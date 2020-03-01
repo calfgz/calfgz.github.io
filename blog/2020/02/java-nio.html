@@ -1,0 +1,972 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css">
+
+
+  <meta name="keywords" content="Java,NIO,">
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="牛犊记" type="application/atom+xml">
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1">
+
+
+
+
+
+
+<meta name="description" content="背景Java NIO(New IO) 是从Java1.4版本开始引入的一个新的IO API, 可以代替标准的Java IO API. NIO与原来的IO有同样的作用和目的，但是使用的方式完全不同，NIO支持面向缓冲区的、基于通道的IO操作。NIO将以更加高效的方式进行文件的读写操作。 NIO与IO的主要区别   IO NIO     面向流 (Stream Oriented) 面向缓冲区(Buff">
+<meta name="keywords" content="Java,NIO">
+<meta property="og:type" content="article">
+<meta property="og:title" content="NIO学习">
+<meta property="og:url" content="http://calfgz.github.io/blog/2020/02/java-nio.html">
+<meta property="og:site_name" content="牛犊记">
+<meta property="og:description" content="背景Java NIO(New IO) 是从Java1.4版本开始引入的一个新的IO API, 可以代替标准的Java IO API. NIO与原来的IO有同样的作用和目的，但是使用的方式完全不同，NIO支持面向缓冲区的、基于通道的IO操作。NIO将以更加高效的方式进行文件的读写操作。 NIO与IO的主要区别   IO NIO     面向流 (Stream Oriented) 面向缓冲区(Buff">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2020-03-01T07:47:47.186Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="NIO学习">
+<meta name="twitter:description" content="背景Java NIO(New IO) 是从Java1.4版本开始引入的一个新的IO API, 可以代替标准的Java IO API. NIO与原来的IO有同样的作用和目的，但是使用的方式完全不同，NIO支持面向缓冲区的、基于通道的IO操作。NIO将以更加高效的方式进行文件的读写操作。 NIO与IO的主要区别   IO NIO     面向流 (Stream Oriented) 面向缓冲区(Buff">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://calfgz.github.io/blog/2020/02/java-nio.html">
+
+
+
+
+
+  <title>NIO学习 | 牛犊记</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?eb8a0170f0ad9db33295cfbe2dc5b699";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">牛犊记</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://calfgz.github.io/blog/2020/02/java-nio.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="calfgz">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="牛犊记">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">NIO学习</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-02-29T18:18:07+08:00">
+                2020-02-29
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Java/" itemprop="url" rel="index">
+                    <span itemprop="name">Java</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2><span id="背景">背景</span></h2><p>Java NIO(New IO) 是从Java1.4版本开始引入的一个新的IO API, 可以代替标准的Java IO API. NIO与原来的IO有同样的作用和目的，但是使用的方式完全不同，NIO支持面向缓冲区的、基于通道的IO操作。NIO将以更加高效的方式进行文件的读写操作。</p>
+<h2><span id="nio与io的主要区别">NIO与IO的主要区别</span></h2><table>
+<thead>
+<tr>
+<th style="text-align:left">IO</th>
+<th style="text-align:left">NIO</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">面向流 (Stream Oriented)</td>
+<td style="text-align:left">面向缓冲区(Buffer Oriented)</td>
+</tr>
+<tr>
+<td style="text-align:left">阻塞IO (Blocking IO)</td>
+<td style="text-align:left">非阻塞IO (Non Blocking IO)</td>
+</tr>
+<tr>
+<td style="text-align:left">(无)</td>
+<td style="text-align:left">选择器 (Selectors)</td>
+</tr>
+</tbody>
+</table>
+<h2><span id="通道和缓冲区">通道和缓冲区</span></h2><p>Java NIO系统的核心在于：通道(Channel)和缓冲区(Buffer)。通道表示打开到IO设备(例如：文件、套接字)的连接。若需要使用NIO系统，需要获取用于连接IO设备的通道以及用于容纳数据的缓冲区。然后操作缓冲区，对数据进行处理。<br>简而言之，Channel负责传输，Buffer负责存储。</p>
+<h3><span id="缓冲区buffer">缓冲区(Buffer)</span></h3><p>缓冲区：一个用于特定基本数据类型的容器。由java.nio包定义的，所有缓冲区都是Buffer抽象类的子类。<br>Java NIO中的Buffer主要用于与NIO通道进行交互，数据是从通道读入缓冲区，从缓冲区写入通道中的。</p>
+<p>Buffer就像一个数组，可以保存多个相同类型的数据。根据数据类型不同(boolean除外)，有以下Buffer常用子类：</p>
+<ul>
+<li>ByteBuffer</li>
+<li>CharBuffer</li>
+<li>ShortBuffer</li>
+<li>IntBuffer</li>
+<li>LongBuffer</li>
+<li>FloatBuffer</li>
+<li>DoubleBuffer</li>
+</ul>
+<p>上述Buffer类他们都采用相似的方法进行管理数据，只是各自管理的数据类型不同而已。都是通过如下方法获取一个Buffer对象：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">static</span> XxxBuffer <span class="title">allocate</span><span class="params">(<span class="keyword">int</span> capacity)</span></span>;    <span class="comment">//创建一个容量为capacity的Buffer对象</span></span><br></pre></td></tr></table></figure></p>
+<h4><span id="缓冲区的基本属性">缓冲区的基本属性</span></h4><p>Buffer中的重要概念</p>
+<ul>
+<li>容量(capacity):表示Buffer最大数据容量，缓冲区容量不能为负，并且创建后不能一更改。</li>
+<li>限制(limit):第一个不应该读取或写入的数据的索引，即位于limit后的数据不可读写。缓冲区的限制不能为负，并且不能大于其容量。</li>
+<li>位置(position):下一个要读取或写入的数据的索引。缓冲区的位置不能为负，不能大于其限制。</li>
+<li>标记(mark)与重置(reset):标记是一个索引，通过Buffer中的mark()方法指定Buffer中一个特定的position，之后可以通过调用reset()方法恢复到这个position。</li>
+<li>标记、位置、限制、容量遵守以下不变式: 0 &lt;= mark &lt;= position &lt;= limit &lt;= capacity</li>
+</ul>
+<h4><span id="buffer的常用方法">Buffer的常用方法</span></h4><table>
+<thead>
+<tr>
+<th style="text-align:left">方法</th>
+<th style="text-align:left">描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">Buffer clear()</td>
+<td style="text-align:left">清空缓冲区并返回对缓冲区的引用</td>
+</tr>
+<tr>
+<td style="text-align:left">Buffer flip()</td>
+<td style="text-align:left">将缓冲区的界限设置为当前位置，并将当前位置重置为0</td>
+</tr>
+<tr>
+<td style="text-align:left">int capacity()</td>
+<td style="text-align:left">返回Buffer的capacity大小</td>
+</tr>
+<tr>
+<td style="text-align:left">boolean hasReaining()</td>
+<td style="text-align:left">判断缓冲区中是否还有元素</td>
+</tr>
+<tr>
+<td style="text-align:left">int limit()</td>
+<td style="text-align:left">返回Buffer的界限(limit)的位置</td>
+</tr>
+<tr>
+<td style="text-align:left">Buffer limit(int n)</td>
+<td style="text-align:left">将设置缓冲区界限为n，并返回一个具有新limit的缓冲区对象</td>
+</tr>
+<tr>
+<td style="text-align:left">Buffer mark()</td>
+<td style="text-align:left">对缓冲区设置标记</td>
+</tr>
+<tr>
+<td style="text-align:left">int position()</td>
+<td style="text-align:left">返回缓冲区的当前位置position</td>
+</tr>
+<tr>
+<td style="text-align:left">Buffer position(int n)</td>
+<td style="text-align:left">将设置缓冲区的当前位置为n，并返回修改后的Buffer对象</td>
+</tr>
+<tr>
+<td style="text-align:left">int remaining()</td>
+<td style="text-align:left">返回position和limit之间的元素个数</td>
+</tr>
+<tr>
+<td style="text-align:left">Buffer reset()</td>
+<td style="text-align:left">将位置position转到以前设置的mark所在位置</td>
+</tr>
+<tr>
+<td style="text-align:left">Buffer rewind()</td>
+<td style="text-align:left">将位置设置为0，取消设置的mark</td>
+</tr>
+</tbody>
+</table>
+<h4><span id="缓冲区的数据操作">缓冲区的数据操作</span></h4><p>Buffer所有子类提供了两个用于数据操作的方法：get()与put()方法。</p>
+<ul>
+<li><p>获取Buffer中的数据</p>
+<ul>
+<li>get(): 读取单个字节</li>
+<li>get(byte[] dst): 批量读取多个字节到dst中</li>
+<li>get(int index): 读取指定索引位置的字节(不会移动position)</li>
+</ul>
+</li>
+<li><p>写入数据到Buffer中</p>
+<ul>
+<li>put(byte b): 将给定单个字节写入缓冲区的当前位置</li>
+<li>put(byte[] src): 将src中的字节写入缓冲区的当前位置</li>
+<li>put(int index, byte b): 将指定字节写入缓冲区的索引位置(不会移动position)</li>
+</ul>
+</li>
+</ul>
+<h4><span id="直接与非直接缓冲区">直接与非直接缓冲区</span></h4><ul>
+<li>非直接缓冲区：磁盘 - 物理内存 - JVM内存 - 应用程序   物理内存和JVM内存会进行copy操作</li>
+<li>直接缓冲区：直接在物理内存中分配单独的空间，物理内存和JVM内存只是映射到该文件</li>
+<li>字节缓冲区要么是直接的，要么是非直接的。如果为直接字节缓冲区，则Java虚拟机会尽最大努力直接在此缓冲区上执行本机I/O操作。也就是说，在每次调用基础操作系统的一个本机I/O操作之前(或之后)，虚拟机都会尽量避免将缓冲区的内容复制到中间缓冲区中(或从中间缓冲区中复制内容)</li>
+<li>直接字节缓冲区可以通过调用此类的allocateDirect()工厂方法来创建。此方法返回的缓冲区进行分配和取消分配所需成本通常高于非直接缓冲区。直接缓冲区的内容可以驻留在常规的垃圾回收堆之外，因此，它们对应用程序的内存需求量造成的影响可能并不影响。所以，建议将直接缓冲区主要分配给那些易受基础系统的本机I/O操作影响的大型、持久的缓冲区。一般情况下，最好仅在直接缓冲区能在程序性能方面带来明显好处时分配它们。</li>
+<li>直接字节缓冲区还可以通过FileChannel的map()方法将文件区域直接映射到内存中来创建。该方法返回MappedByteBuffer。Java平台的实现有助于通过JNI从本机代码创建直接字节缓冲区。如果以上这些缓冲区中的某个缓冲区实例指的是不可访问的内存区域，则试图访问该区域不会更改该缓冲区的内容，并且将会在访问期间或稍后的某个时间导致抛出不确定的异常。</li>
+<li>字节缓冲区是直接缓冲区还是非直接缓冲区可通过调用其 isDirect() 方法来确定。提供此方法是为了能够在性能关键型代码中执行显式缓冲区管理。</li>
+</ul>
+<h3><span id="通道channel">通道(Channel)</span></h3><p>通道(Channel)：由java.nio.channels包定义的。Channel表示IO源与目标打开的连接。Channel类似于传统的“流”。只不过Channel本身不能访问数据，Channel只能与Buffer进行交互。</p>
+<p>Java为Channel接口提供的最主要实现类如下：</p>
+<ul>
+<li>FileChannel: 用于读取、写入、映射和操作文件的通道。</li>
+<li>DatagramChannel: 通过UDP读写网络中的数据通道。</li>
+<li>SocketChannel: 通过TCP读写网络中的数据通道。</li>
+<li>ServerSocketChannel: 可以监听新进来的TCP链接，对每一个新进来的连接都会创建一个SocketChannel。</li>
+</ul>
+<h4><span id="获取通道">获取通道</span></h4><p>获取通道的一种方式是对支持通道的对象调用getChannel()方法。支持通道的类如下：</p>
+<ul>
+<li>FileInputStream</li>
+<li>FileOutputStream</li>
+<li>RandomAccessFile</li>
+<li>DatagramSocket</li>
+<li>Socket</li>
+<li>ServerSocket</li>
+</ul>
+<p>获取通道的其他方式是使用Files类的静态方法newByteChannel()获取字节通道。或者通过通道的静态方法open()打开并返回指定通道。</p>
+<p>通道的数据传输<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//将Buffer中的数据写入Channel中</span></span><br><span class="line"><span class="keyword">int</span> bytesWritten = inChannel.write(buf);</span><br><span class="line"></span><br><span class="line"><span class="comment">//从Channel读取数据到Buffer中</span></span><br><span class="line"><span class="keyword">int</span> bytesRead = inChannel.read(buf);</span><br></pre></td></tr></table></figure></p>
+<p>分散读取(Scattering Reads) 是指从Channel中读取的数据“分散”到多个Buffer中。<br>注意：按照缓冲区的顺序，从Channel中读取的数据依次将Buffer填满。</p>
+<p>聚集写入(Gathering Writes) 是指将多个Buffer中的数据“聚集”到Channel。<br>注意：按照缓冲区的顺序，写入position和limit之间的数据到Channel。</p>
+<p>transferFrom()将数据从源通道传输到其它Channel中:<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">RandomAccessFile fromFile = <span class="keyword">new</span> RandomAccessFile(<span class="string">"data/fromFile.txt"</span>, <span class="string">"rw"</span>);</span><br><span class="line"><span class="comment">//获取FileChannel</span></span><br><span class="line">FileChannel fromChannel = fromFile.getChannel();</span><br><span class="line"></span><br><span class="line">RandomAccessFile toFile = <span class="keyword">new</span> RandomAccessFile(<span class="string">"data/toFile.txt"</span>, <span class="string">"rw"</span>);</span><br><span class="line">FileChannel toChannel = toFile.getChannel();</span><br><span class="line"></span><br><span class="line"><span class="comment">//定义传输位置</span></span><br><span class="line"><span class="keyword">long</span> positon = <span class="number">0L</span>;</span><br><span class="line"><span class="comment">//最多传输的字节数</span></span><br><span class="line"><span class="keyword">long</span> count = fromChannel.size();</span><br><span class="line"></span><br><span class="line"><span class="comment">//将数据从源通道传输到另一个通道</span></span><br><span class="line">toChannel.transferFrom(fromChannel, count, position);</span><br></pre></td></tr></table></figure></p>
+<p>transferTo()将数据从源通道传输到其它Channel中：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">RandomAccessFile fromFile = <span class="keyword">new</span> RandomAccessFile(<span class="string">"data/fromFile.txt"</span>, <span class="string">"rw"</span>);</span><br><span class="line"><span class="comment">//获取FileChannel</span></span><br><span class="line">FileChannel fromChannel = fromFile.getChannel();</span><br><span class="line"></span><br><span class="line">RandomAccessFile toFile = <span class="keyword">new</span> RandomAccessFile(<span class="string">"data/toFile.txt"</span>, <span class="string">"rw"</span>);</span><br><span class="line">FileChannel toChannel = toFile.getChannel();</span><br><span class="line"></span><br><span class="line"><span class="comment">//定义传输位置</span></span><br><span class="line"><span class="keyword">long</span> positon = <span class="number">0L</span>;</span><br><span class="line"><span class="comment">//最多传输的字节数</span></span><br><span class="line"><span class="keyword">long</span> count = fromChannel.size();</span><br><span class="line"></span><br><span class="line"><span class="comment">//将数据从源通道传输到另一个通道</span></span><br><span class="line">fromChannel.transferTo(position, count, toChannel);</span><br></pre></td></tr></table></figure></p>
+<h4><span id="filechannel的常用方法">FileChannel的常用方法</span></h4><table>
+<thead>
+<tr>
+<th style="text-align:left">方法</th>
+<th style="text-align:left">描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">int read(ByteBuffer dst)</td>
+<td style="text-align:left">从Channel中读取数据到ByteBuffer</td>
+</tr>
+<tr>
+<td style="text-align:left">long read(ByteBuffer[] dsts)</td>
+<td style="text-align:left">将从Channel中的数据“分散”到ByteBuffer[]</td>
+</tr>
+<tr>
+<td style="text-align:left">int write(ByteBuffer src)</td>
+<td style="text-align:left">将ByteBuffer中的数据写入到Channel</td>
+</tr>
+<tr>
+<td style="text-align:left">long write(ByteBuffer[] srcs)</td>
+<td style="text-align:left">将ByteBuffer[]中的数据“聚集”到Channel</td>
+</tr>
+<tr>
+<td style="text-align:left">long position()</td>
+<td style="text-align:left">返回此通道的文件位置</td>
+</tr>
+<tr>
+<td style="text-align:left">FileChannel position(long p)</td>
+<td style="text-align:left">设置此通道的文件位置</td>
+</tr>
+<tr>
+<td style="text-align:left">long size()</td>
+<td style="text-align:left">返回此通道的文件的当前大小</td>
+</tr>
+<tr>
+<td style="text-align:left">FileChannel truncate(long s)</td>
+<td style="text-align:left">将此通道的文件截取为给定大小</td>
+</tr>
+<tr>
+<td style="text-align:left">void force(boolean metaData)</td>
+<td style="text-align:left">强制将所有对此通道的文件更新写入到存储设备中</td>
+</tr>
+</tbody>
+</table>
+<h2><span id="nio的非阻塞式网络通信">NIO的非阻塞式网络通信</span></h2><h3><span id="阻塞与非阻塞">阻塞与非阻塞</span></h3><ul>
+<li><p>传统的 IO 流都是阻塞式的。也就是说，当一个线程调用 read() 或 write() 时，该线程被阻塞，直到有一些数据被读取或写入，该线程在此期间不能执行其他任务。因此，在完成网络通信进行 IO 操作时，由于线程会阻塞，所以服务器端必须为每个客户端都提供一个独立的线程进行处理，当服务器端需要处理大量客户端时，性能急剧下降。</p>
+</li>
+<li><p>Java NIO 是非阻塞模式的。当线程从某通道进行读写数据时，若没有数据可用时，该线程可以进行其他任务。线程通常将非阻塞 IO 的空闲时间用于在其他通道上执行 IO 操作，所以单独的线程可以管理多个输入和输出通道。因此，NIO 可以让服务器端使用一个或有限几个线程来同时处理连接到服务器端的所有客户端。</p>
+</li>
+</ul>
+<h3><span id="选择器selector">选择器(Selector)</span></h3><p>选择器（Selector） 是 SelectableChannle 对象的多路复用器，Selector 可以同时监控多个 SelectableChannel 的 IO 状况，也就是说，利用 Selector 可使一个单独的线程管理多个 Channel。Selector 是非阻塞 IO 的核心。</p>
+<p>创建Selector: 通过调用Selector.open()方法创建一个Selector。<br>向选择器注册通道：SelectableChannel.register(Selector sel, int ops)</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//创建一个Socket套接字</span></span><br><span class="line">Socket socket = <span class="keyword">new</span> Socket(InetAddress.getByName(<span class="string">"127.0.0.1"</span>), <span class="number">9898</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">//获取SocketChannel</span></span><br><span class="line">SocketChannel channel = socket.getChannel();</span><br><span class="line"></span><br><span class="line"><span class="comment">//创建选择器</span></span><br><span class="line">Selector selector = Selector.open();</span><br><span class="line"></span><br><span class="line"><span class="comment">//将SocketChannel切换到非阻塞模式</span></span><br><span class="line">channel.configureBlocking(<span class="keyword">false</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">//向Selector注册Channel</span></span><br><span class="line">SelectionKey key = channel.register(selector, SelectionKey.OP_READ);</span><br></pre></td></tr></table></figure>
+<ul>
+<li>当调用register(Selector sel, int ops)将通道注册选择器时，选择器对通道的监听事件，需要通过第二个参数ops指定。</li>
+<li>可以监听的事件类型(可使用SelectionKey的四个常量表示):<ul>
+<li>读: SelectionKey.OP_READ</li>
+<li>写: SelectionKey.OP_WRITE</li>
+<li>连接: SelectionKey.OP_CONNECT</li>
+<li>接收: SelectionKey.OP_ACCEPT</li>
+</ul>
+</li>
+<li>若注册时不止监听一个事件，则可以使用“位或|”操作符连接。</li>
+<li>SelectionKey: 表示SelectableChannel和Selector之间的注册关系。每次向选择器注册通道时就会选择一个事件。选择键包含两个表示为整数值的操作集。操作集的每一位都表示该键的通道所支持的一类可选择操作。</li>
+</ul>
+<h4><span id="管道pipe">管道(Pipe)</span></h4><p>Java NIO管道是2个线程之间的单向数据连接。Pipe有一个source通道和一个sink通道。数据会被写到sink通道，从source通道读取。</p>
+<p>向管道写数据:<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">test</span><span class="params">()</span> <span class="keyword">throws</span> IOException</span>&#123;</span><br><span class="line">    String str = <span class="string">"测试数据"</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//创建管道</span></span><br><span class="line">    Pipe pipe = Pipe.open();</span><br><span class="line"></span><br><span class="line">    <span class="comment">//向管道写输入</span></span><br><span class="line">    Pipe.SinkChannel sinkChannle = pipe.sink();</span><br><span class="line"></span><br><span class="line">    <span class="comment">//通过SinkChannel的write()方法写数据</span></span><br><span class="line">    ByteBuffer buf = ByteBuffer.allocate(<span class="number">1024</span>);</span><br><span class="line">    buf.clear();</span><br><span class="line">    buf.put(str.getBytes());</span><br><span class="line">    buf.flip();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">while</span>(buf.hasRemaining()) &#123;</span><br><span class="line">        sinkChannel.write(buf);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//从管道读取数据</span></span><br><span class="line">    Pipe.SourceChannel sourceChannel = pipe.source();</span><br><span class="line"></span><br><span class="line">    <span class="comment">//调用source通道的read()方法来读取数据</span></span><br><span class="line">    ByteBuffer buf = ByteBuffer.allocate(<span class="number">1024</span>);</span><br><span class="line">    sourceChannel.read(buf);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Java/" rel="tag"># Java</a>
+          
+            <a href="/tags/NIO/" rel="tag"># NIO</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/blog/2019/08/docker-springboot-app.html" rel="next" title="SpringBoot应用通用的Docker容器镜像">
+                <i class="fa fa-chevron-left"></i> SpringBoot应用通用的Docker容器镜像
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image" src="/images/avatar.gif" alt="calfgz">
+          <p class="site-author-name" itemprop="name">calfgz</p>
+           
+              <p class="site-description motion-element" itemprop="description">Draw my work with code</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">32</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">11</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">36</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/calfgz" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#undefined"><span class="nav-number">1.</span> <span class="nav-text">背景</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#undefined"><span class="nav-number">2.</span> <span class="nav-text">NIO与IO的主要区别</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#undefined"><span class="nav-number">3.</span> <span class="nav-text">通道和缓冲区</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#undefined"><span class="nav-number">3.1.</span> <span class="nav-text">缓冲区(Buffer)</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">3.1.1.</span> <span class="nav-text">缓冲区的基本属性</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">3.1.2.</span> <span class="nav-text">Buffer的常用方法</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">3.1.3.</span> <span class="nav-text">缓冲区的数据操作</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">3.1.4.</span> <span class="nav-text">直接与非直接缓冲区</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#undefined"><span class="nav-number">3.2.</span> <span class="nav-text">通道(Channel)</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">3.2.1.</span> <span class="nav-text">获取通道</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">3.2.2.</span> <span class="nav-text">FileChannel的常用方法</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#undefined"><span class="nav-number">4.</span> <span class="nav-text">NIO的非阻塞式网络通信</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#undefined"><span class="nav-number">4.1.</span> <span class="nav-text">阻塞与非阻塞</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#undefined"><span class="nav-number">4.2.</span> <span class="nav-text">选择器(Selector)</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#undefined"><span class="nav-number">4.2.1.</span> <span class="nav-text">管道(Pipe)</span></a></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy;  2017 - 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">calfgz</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
